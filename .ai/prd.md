@@ -1,315 +1,238 @@
-# Dokument wymagań produktu (PRD) - VibeVet AI
+# Dokument wymagań produktu (PRD) - VetAssist
 
 ## 1. Przegląd produktu
 
-VibeVet AI to aplikacja webowa skierowana do weterynarzy, która automatyzuje proces przeliczania dawek leków weterynaryjnych. Aplikacja wykorzystuje sztuczną inteligencję do analizy ulotek leków w formacie PDF i generowania dokładnych dawek na podstawie gatunku zwierzęcia oraz jego parametrów, takich jak waga. System umożliwia użytkownikom tworzenie własnej bazy leków, przeglądanie, edycję i usuwanie wprowadzonych informacji, co przyczynia się do redukcji błędów i zaoszczędzenia czasu podczas codziennej praktyki weterynaryjnej.
+VetAssist to aplikacja wspierająca weterynarzy w ich codziennej praktyce klinicznej. Głównym celem produktu jest usprawnienie procesu podejmowania decyzji medycznych poprzez dostarczenie szybkiego dostępu do trzech kluczowych modułów:
 
-Aplikacja wykorzystuje zewnętrzną usługę do analizy dokumentów PDF, która zwraca dane w ustrukturyzowanym formacie JSON. Dzięki temu weterynarze mogą szybko uzyskać dostęp do potrzebnych informacji o lekach, a następnie dostosować je do swoich potrzeb przed zapisaniem w bazie danych.
+1. Wyszukiwanie interakcji lekowych - umożliwiający sprawdzenie potencjalnych interakcji między różnymi lekami
+2. Kalkulator dawkowania - pomagający w precyzyjnym obliczaniu dawki leku dla różnych gatunków zwierząt
+3. Baza standaryzowanych protokołów leczenia - zapewniająca dostęp do sprawdzonych procedur postępowania w różnych sytuacjach klinicznych
+
+VetAssist (MVP) ma być prostym, intuicyjnym narzędziem, które oszczędza czas lekarzy weterynarii i minimalizuje ryzyko błędów medycznych związanych z nieprawidłowym dawkowaniem leków lub nieznajomością interakcji lekowych.
 
 ## 2. Problem użytkownika
 
-Weterynarze stoją przed następującymi wyzwaniami:
+Weterynarze w swojej pracy napotykają na szereg wyzwań związanych z dostępem do aktualnych i wiarygodnych informacji medycznych:
 
-- Manualne czytanie ulotek i przeliczanie dawek leków weterynaryjnych jest czasochłonne.
-- Proces ten jest podatny na błędy ludzkie, co może prowadzić do nieprawidłowego dawkowania.
-- Brak ujednoliconego systemu do przechowywania i zarządzania informacjami o dawkowaniu leków dla różnych gatunków zwierząt.
-- Trudności w szybkim dostępie do historycznych danych o lekach i ich dawkowaniu.
+1. Brak szybkiego dostępu do informacji o interakcjach między lekami, co może prowadzić do niebezpiecznych kombinacji podczas terapii
+2. Trudność w precyzyjnym dawkowaniu leków dla różnych gatunków zwierząt o zróżnicowanej wadze
+3. Brak łatwego dostępu do standaryzowanych protokołów leczenia, które mogłyby zapewnić spójne podejście do często występujących przypadków klinicznych
+4. Presja czasowa podczas wizyt, utrudniająca wyszukiwanie niezbędnych informacji z różnych źródeł
 
-VibeVet AI rozwiązuje te problemy poprzez automatyzację procesu analizy ulotek leków i przeliczania dawek, umożliwiając weterynarznonym szybsze i dokładniejsze decyzje dotyczące leczenia zwierząt.
+VetAssist odpowiada bezpośrednio na te problemy, dostarczając weterynarze wszystkich niezbędnych informacji w jednym, łatwo dostępnym miejscu, co pozwala na szybkie i pewne podejmowanie decyzji klinicznych.
 
 ## 3. Wymagania funkcjonalne
 
-### 3.1 Przetwarzanie ulotek leków
+### 3.1. Moduł wyszukiwania interakcji lekowych
+- Możliwość wprowadzania listy leków
+- Otrzymywanie informacji o potencjalnych interakcjach (ograniczone do 200 znaków)
+- Możliwość dodania dodatkowego kontekstu (do 50 znaków) do zapytania
+- Interfejs z przyciskami oceny jakości odpowiedzi (kciuk w górę/kciuk w dół)
 
-System będzie korzystał z zewnętrznej usługi do analizy dokumentów PDF z ulotkami leków. Usługa ta będzie zwracać dane w formacie JSON, zawierające informacje o leku, jego dawkowaniu, gatunkach dla których jest przeznaczony oraz skutkach ubocznych.
+### 3.2. Moduł kalkulatora dawkowania
+- Wybór leku z predefiniowanej listy
+- Wprowadzanie wagi zwierzęcia (liczba całkowita do 3 znaków)
+- Wybór gatunku zwierzęcia z listy rozwijanej
+- Wybór docelowej jednostki miary z listy rozwijanej
+- Wyświetlanie wyniku obliczonej dawki
+- Ocena użyteczności wyniku (kciuk w górę/kciuk w dół)
 
-### 3.2 Przeliczanie dawek leków
+### 3.3. Moduł protokołów postępowania
+- Dostęp do standaryzowanych protokołów i checklist postępowania
+- Wyniki ograniczone do 200 znaków
+- Możliwość oceny przydatności protokołu (kciuk w górę/kciuk w dół)
 
-System będzie przeliczał dawki leków na podstawie następujących parametrów:
-- Gatunek zwierzęcia (np. pies, kot)
-- Waga zwierzęcia
-- Jednostka miary (jeśli potrzebna)
-
-### 3.3 Zarządzanie bazą leków
-
-Użytkownicy będą mogli:
-- Przeglądać listę leków w formie tabelarycznej
-- Dodawać nowe leki manualnie
-- Dodawanie leków z plików pdf
-- Zatwierdzanie wygenerowych danych leków przez AI z PDF
-- Edytować informacje o lekach (nazwa, dawkowanie, gatunek, skutki uboczne)
-- Usuwać leki z bazy danych
-
-### 3.4 Zarządzanie kontem użytkownika
-
-System będzie umożliwiał:
-- Tworzenie nowych kont użytkowników
+### 3.4. Zarządzanie kontem użytkownika
+- Rejestracja nowego użytkownika
 - Logowanie do systemu
-- Zmianę hasła (wymaga potwierdzenia)
-- Usuwanie konta (wymaga weryfikacji hasła)
+- Zmiana hasła
+- Usuwanie konta
 
-### 3.5 Interfejs użytkownika
+### 3.5. System audytu i feedbacku
+- Zbieranie ocen użytkowników (kciuk w górę/kciuk w dół)
+- Zapisywanie źródła oceny (który moduł)
+- Gromadzenie danych do analizy satysfakcji użytkowników
 
-Interfejs użytkownika będzie:
-- Prezentował listę leków w formie tabelarycznej
-- Umożliwiał łatwe wprowadzanie danych o zwierzęciu (gatunek, waga)
-- Pozwalał na modyfikację danych przed zapisaniem ich do bazy
-- Zapewniał przyjazną prezentację danych o lekach
+### 3.6. Struktury danych
+- Ujednolicony schemat JSON dla leków z polami: "name", "activeIngredient", "species", "measurementValue", "measurementTarget", "contraindications" (każda wartość ograniczona do 20 znaków)
 
 ## 4. Granice produktu
 
-W ramach MVP nie będą realizowane następujące funkcjonalności:
+W ramach MVP **nie będą** uwzględnione:
 
-- Załączanie wielu plików PDF jednocześnie
-- Integracje z innymi platformami weterynaryjnymi
-- Aplikacje mobilne (tylko wersja webowa)
-- Obsługa innych formatów niż PDF
-- Współdzielenie własnej bazy leków pomiędzy kontami użytkowników
-- Zaawansowane mechanizmy zabezpieczeń poza standardową autentykacją i autoryzacją
+- Rozbudowane zarządzanie wizytami lub kalendarz leczenia
+- Zaawansowane funkcjonalności analizy danych pacjenta
+- Rozbudowany frontend z dużym naciskiem na design
+- System powiadomień
+- Integracja z zewnętrznymi systemami szpitali weterynaryjnych
+- Możliwość dodawania własnych leków do bazy
+- Rozbudowane raportowanie
+- Funkcje społecznościowe lub forum dyskusyjne
+- Aplikacja mobilna (MVP to aplikacja webowa)
 
 ## 5. Historyjki użytkowników
 
-### US-001: Rejestracja nowego użytkownika
+### Zarządzanie kontem użytkownika
 
-#### Tytuł
-Rejestracja nowego użytkownika
+#### US-001
+- Tytuł: Rejestracja nowego użytkownika
+- Opis: Jako nowy użytkownik, chcę móc zarejestrować się w systemie, aby uzyskać dostęp do funkcjonalności aplikacji.
+- Kryteria akceptacji:
+  1. Formularz rejestracji zawiera pola: email, hasło, potwierdzenie hasła
+  2. System waliduje poprawność adresu email
+  3. System wymaga hasła o długości minimum 8 znaków
+  4. System informuje użytkownika o błędach w formularzu
+  5. Po poprawnej rejestracji system wyświetla komunikat o sukcesie
+  6. Użytkownik otrzymuje email z linkiem aktywacyjnym
 
-#### Opis
-Jako nowy użytkownik, chcę utworzyć konto w systemie, aby móc korzystać z funkcji aplikacji i budować własną bazę leków.
+#### US-002
+- Tytuł: Logowanie do systemu
+- Opis: Jako zarejestrowany użytkownik, chcę móc zalogować się do systemu, aby korzystać z dostępnych funkcjonalności.
+- Kryteria akceptacji:
+  1. Formularz logowania zawiera pola: email i hasło
+  2. System waliduje poprawność wprowadzonych danych
+  3. System informuje użytkownika o błędach logowania
+  4. Po poprawnym logowaniu użytkownik jest przekierowany do strony głównej
+  5. System zapamiętuje sesję użytkownika
 
-#### Kryteria akceptacji
-1. Użytkownik może wprowadzić adres e-mail, hasło i potwierdzenie hasła.
-2. System wymaga hasła o odpowiedniej sile (minimum 8 znaków, w tym litery, cyfry i znaki specjalne).
-3. System sprawdza, czy adres e-mail nie jest już zarejestrowany.
-4. System wysyła e-mail z linkiem aktywacyjnym.
-5. Konto jest aktywowane po kliknięciu w link.
-6. Użytkownik otrzymuje potwierdzenie utworzenia konta.
+#### US-003
+- Tytuł: Zmiana hasła
+- Opis: Jako zalogowany użytkownik, chcę móc zmienić hasło do swojego konta, aby zapewnić jego bezpieczeństwo.
+- Kryteria akceptacji:
+  1. Dostępna opcja zmiany hasła w ustawieniach konta
+  2. Formularz zawiera pola: aktualne hasło, nowe hasło, potwierdzenie nowego hasła
+  3. System waliduje poprawność aktualnego hasła
+  4. Nowe hasło musi spełniać wymogi bezpieczeństwa (min. 8 znaków)
+  5. System informuje o pomyślnej zmianie hasła
 
-### US-002: Logowanie do systemu
+#### US-004
+- Tytuł: Usuwanie konta
+- Opis: Jako zalogowany użytkownik, chcę móc usunąć swoje konto, aby moje dane zostały usunięte z systemu.
+- Kryteria akceptacji:
+  1. Dostępna opcja usunięcia konta w ustawieniach
+  2. System wymaga potwierdzenia operacji przez wprowadzenie hasła
+  3. System wyświetla ostrzeżenie o nieodwracalności operacji
+  4. Po usunięciu konta wszystkie dane użytkownika są usuwane
+  5. Po usunięciu konta użytkownik jest wylogowywany i przekierowany na stronę główną
 
-#### Tytuł
-Logowanie do systemu
+#### US-005
+- Tytuł: Odzyskiwanie zapomnianego hasła
+- Opis: Jako użytkownik, który zapomniał hasła, chcę móc je zresetować, aby odzyskać dostęp do mojego konta.
+- Kryteria akceptacji:
+  1. Dostępna opcja "Zapomniałem hasła" na stronie logowania
+  2. Formularz wymaga podania adresu email
+  3. System wysyła email z linkiem do resetowania hasła
+  4. Link do resetowania hasła jest ważny przez 24 godziny
+  5. Po kliknięciu w link użytkownik może ustawić nowe hasło
 
-#### Opis
-Jako zarejestrowany użytkownik, chcę logować się do systemu, aby uzyskać dostęp do moich zapisanych leków i korzystać z funkcji aplikacji.
+### Moduł interakcji lekowych
 
-#### Kryteria akceptacji
-1. Użytkownik może wprowadzić adres e-mail i hasło.
-2. System weryfikuje poprawność danych logowania.
-3. System informuje o błędnych danych logowania.
-4. Po poprawnym logowaniu użytkownik jest przekierowywany do strony głównej aplikacji.
-5. Sesja użytkownika jest utrzymywana przez określony czas.
+#### US-006
+- Tytuł: Wyszukiwanie interakcji lekowych
+- Opis: Jako weterynarz, chcę móc wprowadzić listę leków, aby sprawdzić potencjalne interakcje między nimi.
+- Kryteria akceptacji:
+  1. Interfejs umożliwia wybór kilku leków z listy
+  2. System generuje informację o interakcjach (do 200 znaków)
+  3. Wynik jest prezentowany w czytelny sposób
+  4. System informuje, jeśli nie znaleziono interakcji
 
-### US-003: Zmiana hasła
+#### US-007
+- Tytuł: Dodawanie kontekstu do wyszukiwania interakcji
+- Opis: Jako weterynarz, chcę móc dodać kontekst do wyszukiwania interakcji, aby otrzymać bardziej precyzyjną odpowiedź.
+- Kryteria akceptacji:
+  1. Dostępne pole do wprowadzenia dodatkowego kontekstu (max 50 znaków)
+  2. System uwzględnia dodatkowy kontekst w generowaniu odpowiedzi
+  3. Pole kontekstu jest opcjonalne
 
-#### Tytuł
-Zmiana hasła do konta
+#### US-008
+- Tytuł: Ocena wyników interakcji lekowych
+- Opis: Jako weterynarz, chcę móc ocenić otrzymane informacje o interakcjach, aby pomóc w ulepszaniu systemu.
+- Kryteria akceptacji:
+  1. Dostępne przyciski oceny (kciuk w górę/kciuk w dół)
+  2. System zapisuje ocenę wraz z identyfikacją modułu
+  3. System potwierdza zapisanie oceny
 
-#### Opis
-Jako zalogowany użytkownik, chcę zmienić hasło do mojego konta, aby zwiększyć bezpieczeństwo moich danych.
+### Moduł kalkulatora dawkowania
 
-#### Kryteria akceptacji
-1. Użytkownik może wprowadzić stare hasło, nowe hasło i potwierdzenie nowego hasła.
-2. System weryfikuje poprawność starego hasła.
-3. System sprawdza, czy nowe hasło spełnia wymagania bezpieczeństwa.
-4. System wymaga potwierdzenia zmiany hasła.
-5. Użytkownik otrzymuje potwierdzenie zmiany hasła.
+#### US-009
+- Tytuł: Obliczanie dawki leku
+- Opis: Jako weterynarz, chcę móc obliczyć dawkę leku dla zwierzęcia, aby zapewnić bezpieczne dawkowanie.
+- Kryteria akceptacji:
+  1. Interfejs umożliwia wybór leku z listy
+  2. Możliwość wprowadzenia wagi zwierzęcia (do 3 cyfr)
+  3. Możliwość wyboru gatunku zwierzęcia z listy
+  4. Możliwość wyboru docelowej jednostki miary
+  5. System oblicza i wyświetla dawkę leku
+  6. System informuje o ewentualnych przeciwwskazaniach
 
-### US-004: Usunięcie konta
+#### US-010
+- Tytuł: Walidacja danych w kalkulatorze dawkowania
+- Opis: Jako weterynarz, chcę aby system walidował wprowadzane dane, aby uniknąć błędów w obliczeniach.
+- Kryteria akceptacji:
+  1. System sprawdza, czy waga jest liczbą całkowitą do 3 cyfr
+  2. System nie pozwala na przesłanie formularza z nieprawidłowymi danymi
+  3. System wyświetla komunikaty o błędach walidacji
 
-#### Tytuł
-Usunięcie konta użytkownika
+#### US-011
+- Tytuł: Ocena wyników kalkulatora dawkowania
+- Opis: Jako weterynarz, chcę móc ocenić otrzymane obliczenia dawkowania, aby pomóc w ulepszaniu systemu.
+- Kryteria akceptacji:
+  1. Dostępne przyciski oceny (kciuk w górę/kciuk w dół)
+  2. System zapisuje ocenę wraz z identyfikacją modułu
+  3. System potwierdza zapisanie oceny
 
-#### Opis
-Jako zalogowany użytkownik, chcę usunąć moje konto, aby usunąć moje dane z systemu.
+### Moduł protokołów postępowania
 
-#### Kryteria akceptacji
-1. Użytkownik może zainicjować proces usunięcia konta.
-2. System wymaga podania hasła w celu weryfikacji.
-3. System wymaga potwierdzenia usunięcia konta.
-4. Po usunięciu konta, wszystkie dane użytkownika są usuwane z systemu.
-5. Użytkownik otrzymuje potwierdzenie usunięcia konta.
+#### US-012
+- Tytuł: Wyszukiwanie protokołów postępowania
+- Opis: Jako weterynarz, chcę móc wyszukać standardowe protokoły postępowania dla danej sytuacji klinicznej, aby zapewnić prawidłowe leczenie.
+- Kryteria akceptacji:
+  1. Interfejs umożliwia wprowadzenie opisu sytuacji klinicznej
+  2. System generuje protokół postępowania (do 200 znaków)
+  3. Wynik jest prezentowany w czytelny sposób
 
-### US-005: Przesyłanie ulotki leku w PDF
+#### US-013
+- Tytuł: Ocena protokołów postępowania
+- Opis: Jako weterynarz, chcę móc ocenić otrzymane protokoły postępowania, aby pomóc w ulepszaniu systemu.
+- Kryteria akceptacji:
+  1. Dostępne przyciski oceny (kciuk w górę/kciuk w dół)
+  2. System zapisuje ocenę wraz z identyfikacją modułu
+  3. System potwierdza zapisanie oceny
 
-#### Tytuł
-Przesyłanie ulotki leku w formacie PDF
+### Nawigacja i interfejs
 
-#### Opis
-Jako zalogowany użytkownik, chcę przesłać ulotkę leku w formacie PDF, aby system mógł automatycznie wyodrębnić informacje o leku.
+#### US-014
+- Tytuł: Nawigacja między modułami
+- Opis: Jako weterynarz, chcę móc łatwo nawigować między trzema głównymi modułami, aby efektywnie korzystać z aplikacji.
+- Kryteria akceptacji:
+  1. Widoczne, wyraźnie oddzielone moduły w interfejsie
+  2. Intuicyjne menu nawigacyjne
+  3. Przejście między modułami nie wymaga przeładowania całej strony
+  4. Aktualnie wybrany moduł jest wizualnie oznaczony
 
-#### Kryteria akceptacji
-1. Użytkownik może wybrać plik PDF z lokalnego komputera.
-2. System sprawdza, czy plik jest w formacie PDF.
-3. System informuje o maksymalnym rozmiarze pliku.
-4. System wysyła plik do zewnętrznej usługi analizującej.
-5. System wyświetla komunikat o trwającym przetwarzaniu.
-6. Po zakończeniu przetwarzania, system prezentuje wyodrębnione dane.
-
-### US-006: Przeglądanie wyników analizy ulotki
-
-#### Tytuł
-Przeglądanie wyników analizy ulotki
-
-#### Opis
-Jako zalogowany użytkownik, chcę zobaczyć wyniki analizy ulotki leku, aby sprawdzić poprawność wyodrębnionych informacji.
-
-#### Kryteria akceptacji
-1. System prezentuje nazwę leku, dawkowanie, gatunki oraz skutki uboczne.
-2. Informacje są przedstawione w przejrzysty i czytelny sposób.
-3. Użytkownik może przejrzeć wszystkie wyodrębnione dane przed zapisaniem.
-4. System oznacza miejsca, gdzie dane mogą być niepewne lub niekompletne.
-
-### US-007: Edycja danych o leku przed zapisaniem
-
-#### Tytuł
-Edycja danych o leku przed zapisaniem
-
-#### Opis
-Jako zalogowany użytkownik, chcę mieć możliwość edycji danych o leku przed zapisaniem ich do bazy, aby poprawić ewentualne błędy analizy.
-
-#### Kryteria akceptacji
-1. Użytkownik może edytować nazwę leku.
-2. Użytkownik może edytować informacje o dawkowaniu.
-3. Użytkownik może edytować listę gatunków.
-4. Użytkownik może edytować informacje o skutkach ubocznych.
-5. System zapisuje zmiany po zatwierdzeniu przez użytkownika.
-
-### US-008: Zapisywanie leku do bazy danych
-
-#### Tytuł
-Zapisywanie leku do bazy danych
-
-#### Opis
-Jako zalogowany użytkownik, chcę zapisać lek do mojej bazy danych, aby móc go później wykorzystać.
-
-#### Kryteria akceptacji
-1. Użytkownik może zatwierdzić zapisanie leku do bazy danych.
-2. System weryfikuje, czy wszystkie wymagane pola są wypełnione.
-3. System zapisuje lek w bazie danych użytkownika.
-4. Użytkownik otrzymuje potwierdzenie zapisania leku.
-
-### US-009: Manualne dodawanie leku do bazy
-
-#### Tytuł
-Manualne dodawanie leku do bazy
-
-#### Opis
-Jako zalogowany użytkownik, chcę móc ręcznie dodać lek do mojej bazy, bez konieczności analizy ulotki PDF.
-
-#### Kryteria akceptacji
-1. Użytkownik może wprowadzić nazwę leku, dawkowanie, gatunki oraz skutki uboczne.
-2. System weryfikuje, czy wszystkie wymagane pola są wypełnione.
-3. Użytkownik zatwierdza poprawność wygenerowanych danych leków.
-4. Użytkownik może zapisać wprowadzone dane.
-5. System zapisuje lek w bazie danych użytkownika.
-6. Użytkownik otrzymuje potwierdzenie zapisania leku.
-
-### US-010: Przeglądanie bazy leków
-
-#### Tytuł
-Przeglądanie bazy leków
-
-#### Opis
-Jako zalogowany użytkownik, chcę przeglądać moją bazę leków, aby znaleźć potrzebne informacje.
-
-#### Kryteria akceptacji
-1. System wyświetla listę leków w formie tabelarycznej.
-2. Użytkownik może sortować leki według nazwy, gatunku, itp.
-3. Użytkownik może filtrować leki według różnych kryteriów.
-4. System wyświetla podstawowe informacje o lekach w tabeli.
-5. Użytkownik może kliknąć na lek, aby zobaczyć szczegółowe informacje.
-
-### US-011: Edycja zapisanego leku
-
-#### Tytuł
-Edycja zapisanego leku
-
-#### Opis
-Jako zalogowany użytkownik, chcę edytować informacje o zapisanym leku, aby zaktualizować dane.
-
-#### Kryteria akceptacji
-1. Użytkownik może wybrać lek do edycji.
-2. System wyświetla formularz z aktualnymi danymi leku.
-3. Użytkownik może edytować wszystkie pola.
-4. System weryfikuje, czy wszystkie wymagane pola są wypełnione po edycji.
-5. System zapisuje zaktualizowane dane.
-6. Użytkownik otrzymuje potwierdzenie aktualizacji danych.
-
-### US-012: Usuwanie leku z bazy
-
-#### Tytuł
-Usuwanie leku z bazy
-
-#### Opis
-Jako zalogowany użytkownik, chcę usunąć lek z mojej bazy danych, gdy nie jest już potrzebny.
-
-#### Kryteria akceptacji
-1. Użytkownik może wybrać lek do usunięcia.
-2. System wymaga potwierdzenia usunięcia leku.
-3. Po potwierdzeniu, lek jest usuwany z bazy danych.
-4. Użytkownik otrzymuje potwierdzenie usunięcia leku.
-
-### US-013: Przeliczanie dawki leku
-
-#### Tytuł
-Przeliczanie dawki leku
-
-#### Opis
-Jako zalogowany użytkownik, chcę przeliczyć dawkę leku dla konkretnego zwierzęcia, aby określić odpowiednią ilość leku.
-
-#### Kryteria akceptacji
-1. Użytkownik może wybrać lek z bazy.
-2. Użytkownik może wybrać gatunek zwierzęcia.
-3. Użytkownik może wprowadzić wagę zwierzęcia.
-4. Użytkownik może wybrać jednostkę miary wagi (jeśli potrzebna).
-5. System przelicza dawkę leku na podstawie wprowadzonych danych.
-6. System wyświetla przeliczoną dawkę leku.
-
-### US-014: Podsumowanie leków z podziałem
-
-#### Tytuł
-Generowanie podsumowania leków
-
-#### Opis
-Jako zalogowany użytkownik, chcę wygenerować podsumowanie leków z podziałem na dawkę i gatunek, aby mieć przejrzysty obraz mojej bazy leków.
-
-#### Kryteria akceptacji
-1. Użytkownik może zainicjować generowanie podsumowania.
-2. System generuje raport z podziałem leków według dawki i gatunku.
-3. System prezentuje dane w przejrzystej formie.
-4. Użytkownik może sortować i filtrować wyniki podsumowania.
-
-### US-015: Wylogowanie z systemu
-
-#### Tytuł
-Wylogowanie z systemu
-
-#### Opis
-Jako zalogowany użytkownik, chcę wylogować się z systemu, aby zakończyć sesję.
-
-#### Kryteria akceptacji
-1. Użytkownik może kliknąć przycisk wylogowania.
-2. System kończy sesję użytkownika.
-3. Użytkownik jest przekierowywany na stronę logowania.
-4. Dane sesji są usuwane.
+#### US-015
+- Tytuł: Dostęp do historii wyszukiwań
+- Opis: Jako weterynarz, chcę mieć dostęp do historii moich wcześniejszych wyszukiwań i obliczeń, aby nie musieć powtarzać tych samych operacji.
+- Kryteria akceptacji:
+  1. Lista ostatnich wyszukiwań/obliczeń dla zalogowanego użytkownika
+  2. Możliwość ponownego użycia wcześniejszych zapytań
+  3. Historia wyszukiwań zapisywana jest oddzielnie dla każdego modułu
 
 ## 6. Metryki sukcesu
 
-### 6.1 Metryki techniczne
+### 6.1. Metryki techniczne
+- Czas odpowiedzi na zapytania o interakcje lekowe: średnio poniżej 2 sekund
+- Czas odpowiedzi na zapytania o protokoły leczenia: średnio poniżej 2 sekund
+- Czas obliczania dawki leku: natychmiastowy (poniżej 0,5 sekundy)
+- Dostępność systemu: minimum 99,5% czasu
 
-- 75% danych o lekach wygenerowanych przez AI jest akceptowane przez użytkownika bez konieczności edycji.
-- Średni czas przetwarzania ulotki PDF nie przekracza 10 sekund.
-- System działa stabilnie przy jednoczesnym użytkowaniu przez co najmniej 50 użytkowników.
+### 6.2. Metryki użyteczności
+- Pozytywny feedback od użytkowników: minimum 75% ocen pozytywnych (kciuk w górę)
+- Liczba błędów zgłaszanych przez użytkowników: malejąca z tygodnia na tydzień
+- Czas potrzebny nowemu użytkownikowi na wykonanie podstawowych operacji: poniżej 1 minuty
 
-### 6.2 Metryki biznesowe
-
-- 75% użytkowników generuje minimum 5 leków i ich dawek miesięcznie.
-- 60% użytkowników wraca do aplikacji co najmniej raz w tygodniu.
-- Liczba aktywnych użytkowników rośnie o minimum 10% miesięcznie.
-
-### 6.3 Metryki użytkownika
-
-- Czas potrzebny na dodanie nowego leku (od przesłania ulotki do zapisania w bazie) nie przekracza 2 minut.
-- 70% użytkowników ocenia interfejs aplikacji jako intuicyjny i łatwy w obsłudze.
-- Liczba zgłaszanych problemów z przeliczaniem dawek nie przekracza 5% wszystkich przeprowadzonych przeliczeń.
+### 6.3. Metryki adopcji
+- Liczba aktywnych użytkowników: wzrost o minimum 10% miesięcznie
+- Liczba przeprowadzonych obliczeń dawek: minimum 5 na aktywnego użytkownika tygodniowo
+- Liczba wyszukanych interakcji lekowych: minimum 3 na aktywnego użytkownika tygodniowo
+- Liczba wyszukanych protokołów: minimum 2 na aktywnego użytkownika tygodniowo
