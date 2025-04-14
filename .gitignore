@@ -2,10 +2,10 @@
 dist/
 
 # generated types
-.astro/
+frontend/.astro/
 
 # dependencies
-node_modules/
+frontend/node_modules/
 
 # logs
 npm-debug.log*
@@ -22,3 +22,8 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
