@@ -1,7 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-from .managers import CustomDrugManager, UserSearchHistoryManager
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from .managers import (
+    CustomDrugManager, 
+    UserSearchHistoryManager,
+    DrugInteractionManager,
+    TreatmentGuideManager
+)
 
 class BaseAuditModel(models.Model):
     """
@@ -148,6 +155,8 @@ class DrugInteraction(BaseAuditModel):
         related_name='interactions'
     )
 
+    objects = DrugInteractionManager()
+
     class Meta:
         db_table = 'drug_interaction'
         verbose_name = 'Drug Interaction'
@@ -171,6 +180,8 @@ class TreatmentGuide(BaseAuditModel):
     factors = models.JSONField()
     positive_rating = models.PositiveIntegerField(default=0)
     negative_rating = models.PositiveIntegerField(default=0)
+
+    objects = TreatmentGuideManager()
 
     class Meta:
         db_table = 'treatment_guide'
@@ -222,14 +233,16 @@ class UserSearchHistory(BaseAuditModel):
     """
     Model to store user search history across different modules.
     """
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='search_history'
+    module = models.CharField(
+        max_length=20,
+        db_index=True,
+        help_text="Module identifier (e.g., 'drug-interaction', 'dosage-calc', 'treatment-guide')"
     )
-    module = models.CharField(max_length=20)
-    query = models.TextField()
+    query = models.TextField(
+        help_text="The search query or interaction content"
+    )
 
+    # Use custom manager that implements RLS
     objects = UserSearchHistoryManager()
 
     class Meta:
@@ -237,13 +250,39 @@ class UserSearchHistory(BaseAuditModel):
         verbose_name = 'User Search History'
         verbose_name_plural = 'User Search Histories'
         indexes = [
-            models.Index(fields=['user']),
-            models.Index(fields=['module']),
-            models.Index(fields=['user', 'module']),
-            models.Index(fields=['created_at'])
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['created_by', '-created_at']),
+            models.Index(fields=['created_by', 'module', '-created_at'])
         ]
 
     def __str__(self) -> str:
-        if hasattr(self, 'user') and self.user:
-            return str(f"{str(self.user)} - {self.module}: {str(self.query)[:50]}...")
-        return str(f"Unknown - {self.module}: {str(self.query)[:50]}...")
+        return f"{self.module} search by {self.created_by} at {self.created_at}"
+
+
+class Rating(BaseAuditModel):
+    """
+    Generic model for storing user ratings for different types of content (drug interactions, diagnoses, etc.).
+    Uses Django's ContentTypes framework to create generic relations.
+    """
+    RATING_CHOICES = [
+        ('up', 'Positive'),
+        ('down', 'Negative')
+    ]
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    rating = models.CharField(max_length=4, choices=RATING_CHOICES)
+
+    class Meta:
+        db_table = 'rating'
+        verbose_name = 'Rating'
+        verbose_name_plural = 'Ratings'
+        indexes = [
+            models.Index(fields=['content_type', 'object_id']),
+            models.Index(fields=['created_by'])
+        ]
+        unique_together = [['created_by', 'content_type', 'object_id']]
+
+    def __str__(self) -> str:
+        return f"{self.created_by}'s {self.rating} rating for {self.content_type.model} {self.object_id}"

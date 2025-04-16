@@ -107,6 +107,36 @@ The application aims to save time for veterinary practitioners and minimize medi
    python manage.py runserver
    ```
 
+## Project Initialization
+
+1. Create a virtual environment:
+   ```
+   python -m venv env
+   ```
+2. Activate the environment:
+   - Windows: `env\Scripts\activate`
+   - macOS/Linux: `source env/bin/activate`
+3. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+4. Configure environment variables in `backend/.env`
+5. Run Django migrations:
+   ```
+   cd backend
+   python manage.py migrate
+   ```
+6. Start the Django development server:
+   ```
+   python manage.py runserver
+   ```
+7. Optionally, run the Astro frontend server in another terminal:
+   ```
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
 ## Available Scripts
 
 In the project directory, you can run:

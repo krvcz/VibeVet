@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AnonymousUser
+from django.contrib.auth.models import User, AnonymousUser
 from django.core.handlers.wsgi import WSGIRequest
 import threading
 
@@ -14,39 +14,61 @@ def set_thread_local_request(request: WSGIRequest):
     _thread_local.request = request
 
 
-class CustomDrugManager(models.Manager):
+class BaseSecurityManager(models.Manager):
+    """
+    Base manager implementing row-level security with mock user support.
+    """
+    def get_queryset(self):
+        user = self._get_current_user()
+        if isinstance(user, AnonymousUser):
+            try:
+                # Try to get the mock user directly if request is not available
+                user = User.objects.get(id=1)
+            except User.DoesNotExist:
+                # This should never happen as MockUserMiddleware creates the user
+                return super().get_queryset().none()
+        
+        if user.is_superuser:
+            return super().get_queryset()
+        return super().get_queryset().filter(created_by=user)
+
+    def _get_current_user(self):
+        request = get_thread_local_request()
+        if request and hasattr(request, 'user'):
+            return request.user
+        return AnonymousUser()
+
+
+class CustomDrugManager(BaseSecurityManager):
     """
     Custom manager for CustomDrug model to implement row-level security.
     """
     def get_queryset(self):
         user = self._get_current_user()
         if isinstance(user, AnonymousUser):
-            return super().get_queryset().none()
+            try:
+                user = User.objects.get(id=1)
+            except User.DoesNotExist:
+                return super().get_queryset().none()
+        
         if user.is_superuser:
             return super().get_queryset()
         return super().get_queryset().filter(user=user)
 
-    def _get_current_user(self):
-        request = get_thread_local_request()
-        if request and hasattr(request, 'user'):
-            return request.user
-        return AnonymousUser()
 
-
-class UserSearchHistoryManager(models.Manager):
+class UserSearchHistoryManager(BaseSecurityManager):
     """
     Custom manager for UserSearchHistory model to implement row-level security.
     """
-    def get_queryset(self):
-        user = self._get_current_user()
-        if isinstance(user, AnonymousUser):
-            return super().get_queryset().none()
-        if user.is_superuser:
-            return super().get_queryset()
-        return super().get_queryset().filter(user=user)
 
-    def _get_current_user(self):
-        request = get_thread_local_request()
-        if request and hasattr(request, 'user'):
-            return request.user
-        return AnonymousUser()
+
+class DrugInteractionManager(BaseSecurityManager):
+    """
+    Custom manager for DrugInteraction model to implement row-level security.
+    """
+
+
+class TreatmentGuideManager(BaseSecurityManager):
+    """
+    Custom manager for TreatmentGuide model to implement row-level security.
+    """
