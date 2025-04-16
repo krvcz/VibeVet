@@ -29,6 +29,10 @@ When introducing changes to the project, always follow the directory structure b
 - `./frontend/src/lib` - Services and helpers
 - `./frontend/src/assets` - static internal assets
 - `./frontend/public` - public assets
+- `./backend` - Django backend services
+- `./backend/config` - Django configuration files
+- `./backend/core` - Core application logic and models
+- `./backend/core/migrations` - Database migrations
 
 When modifying the directory structure, always update this section.
 
