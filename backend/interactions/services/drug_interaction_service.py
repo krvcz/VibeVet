@@ -3,6 +3,9 @@ from typing import List, Literal, Optional
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
+import json
+
+from common.services.openrouter_service import OpenRouterService
 from ..models import DrugInteraction
 from drugs.models import Drug
 from common.services import rating_service
@@ -58,25 +61,104 @@ def find_interaction_with_same_drugs(drug_ids: list[int]) -> Optional[DrugIntera
 
 
 def create_interaction(*, drugs: List[Drug], user: 'AbstractUser', context: str = None) -> DrugInteraction:
-    """Create a new drug interaction record or return existing one."""
-        
-    # Create new interaction if none exists
-    drug_names = sorted([drug.name for drug in drugs])
-    query = ", ".join(drug_names)
+    """Create a new drug interaction record.
     
-    mock_result = "Mock AI-generated result for drugs: " + query
-
-    interaction = DrugInteraction.objects.create(
-        query=query,
-        result=mock_result,
-        context=context,
-        created_by=user
-    )
-    interaction.drugs.set(drugs)
-
-    logger.info(f"Created new drug interaction: {interaction.id} for drugs: {query}")
+    Args:
+        drugs: List of drugs to check interactions for
+        user: User creating the interaction
+        context: Optional additional context for the interaction
         
-    return interaction
+    Returns:
+        DrugInteraction: The created interaction record
+    """
+    # Prepare drug names for the query
+    drug_names = sorted([drug.name for drug in drugs])
+    drug_details = [f"{drug.name} ({drug.active_ingredient}, {drug.contraindications})" for drug in drugs]
+    query = ", ".join(drug_names)
+
+    # Prepare the OpenRouter request
+    system_message = """Jesteś ekspertem od interakcji leków weterynaryjnych. Analizuj potencjalne interakcje między podanymi lekami, ich składnikami aktywnymi i przeciwwskazaniami.
+    Weź pod uwagę:
+    1. Bezpośrednie interakcje farmakologiczne
+    2. Łączne działanie na układy narządów
+    3. Przeciwwskazania i czynniki ryzyka
+    4. Implikacje kliniczne i stopień nasilenia
+    Przedstaw ustrukturyzowaną analizę z poziomem nasilenia, mechanizmem interakcji i zaleceniami klinicznymi. Używaj tylko i wyłączenie języka polskiego."""
+
+    user_message = f"Przeanalizuj potencjalne interakcje między lekami: {', '.join(drug_details)}"
+    if context:
+        user_message += f"\nDodatkowy kontekst: {context}"
+
+    response_format = {
+      "type": "json_schema",
+      "json_schema": {
+        "name": "interaction",
+        "strict": True,
+        "schema": {
+          "type": "object",
+          "properties": {
+            "severity": {
+              "type": "string",
+              "description": "Poziom nasilenia interakcji leków (niski, umiarkowany, wysoki, przeciwwskazany)",
+            },
+            "summary": {
+              "type": "string",
+              "description": "Krótki przegląd interakcji. Maksymalnie 2-3 zdania.",
+            },
+            "mechanism": {
+              "type": "string",
+              "description": "Szczegółowe wyjaśnienie mechanizmu interakcji. Maksymalnie 2-3 zdania.",
+            },
+            "recommendations": {
+              "type": "string",
+              "description": "Zalecenia kliniczne dotyczące zarządzania interakcją. Maksymalnie 2-3 zdania.",
+            },
+          },
+          "required": ["severity", "summary", "mechanism", "recommendations"],
+          "additionalProperties": False,
+        },
+      },
+    }
+
+    # Initialize OpenRouter service and send request
+    try:
+        open_router = OpenRouterService()
+        result = open_router.send_openrouter_request(
+            system_message=system_message,
+            user_message=user_message,
+            response_format=response_format,
+            model_name="openai/gpt-4o-mini",  # Updated model name format
+            model_params={
+                "temperature": 0.3,  # Lower temperature for more focused/consistent responses
+                "max_tokens": 1000,
+                "top_p": 0.95,
+                "frequency_penalty": 0,
+                "presence_penalty": 0
+            }
+        )
+
+        logger.info(
+            "Received OpenRouter response for drugs: %s with confidence: %f",
+            query,
+            result.get("confidence", 0)
+        )
+
+        # Create interaction record
+        interaction = DrugInteraction.objects.create(
+            query=query,
+            result=json.dumps(result),  # Store the full structured response
+            context=context,
+            created_by=user
+        )
+        interaction.drugs.set(drugs)
+
+        logger.info(f"Created new drug interaction: {interaction.id} for drugs: {query}")
+        return interaction
+
+    except Exception as e:
+        logger.error("Error creating drug interaction: %s", str(e))
+        raise DrugInteractionValidationError(f"Failed to analyze drug interactions: {str(e)}")
+
 
 def rate_interaction(*, interaction_id: int, rating: Literal['up', 'down'], user: 'AbstractUser') -> None:
     """

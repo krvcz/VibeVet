@@ -1,6 +1,6 @@
-# AI Rules for {{project-name}}
+# AI Rules for VetAssist
 
-{{project-description}}
+A modern web application that helps veterinarians make informed clinical decisions by providing quick access to drug interaction data, dosage calculations, and differential diagnostics.
 
 ## Tech Stack
 
@@ -21,9 +21,9 @@ When introducing changes to the project, always follow the directory structure b
 - `./frontend/src` - source code
 - `./frontend/src/layouts` - Astro layouts
 - `./frontend/src/pages` - Astro pages
-- `./frontend/src/pages/api` - API endpoints
-- `./frontend/src/middleware/index.ts` - Astro middleware
-- `./frontend/src/types.ts` - Shared types for backend and frontend (Entities, DTOs)
+- `./frontend/src/lib/types.ts` - Shared types for backend and frontend (Entities, DTOs)
+- `./frontend/src/lib/api` - API endpoints (auth.ts, client.ts, drugs.ts, interactions.ts, mockData.ts, searchHistory.ts, species.ts, treatments.ts, units.ts)
+- `./frontend/src/middleware` - Astro middleware
 - `./frontend/src/components` - Client-side components written in Astro (static) and React (dynamic)
 - `./frontend/src/components/ui` - Client-side components from Shadcn/ui
 - `./frontend/src/lib` - Services and helpers
@@ -31,8 +31,23 @@ When introducing changes to the project, always follow the directory structure b
 - `./frontend/public` - public assets
 - `./backend` - Django backend services
 - `./backend/config` - Django configuration files
-- `./backend/core` - Core application logic and models
-- `./backend/core/migrations` - Database migrations
+- `./backend/common` - Common application logic and models
+- `./backend/common/migrations` - Database migrations for common app
+- `./backend/common/services` - Business logic/services for common app
+- `./backend/drugs` - Drugs application logic and models
+- `./backend/drugs/migrations` - Database migrations for drugs app
+- `./backend/drugs/services` - Business logic/services for drugs app
+- `./backend/interactions` - Interactions application logic and models
+- `./backend/interactions/migrations` - Database migrations for interactions app
+- `./backend/interactions/services` - Business logic/services for interactions app
+- `./backend/treatments` - Treatments application logic and models
+- `./backend/treatments/migrations` - Database migrations for treatments app
+- `./backend/treatments/services` - Business logic/services for treatments app
+- `./backend/users` - Users application logic and models
+- `./backend/users/migrations` - Database migrations for users app
+- `./backend/users/services` - Business logic/services for users app
+- `./backend/fixtures` - fixtures with data samples
+- `./backend/logs` - backend log files
 
 When modifying the directory structure, always update this section.
 

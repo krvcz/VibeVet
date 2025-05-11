@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../components/ui/Card';
-import Select from '../components/ui/Select';
-import Textarea from '../components/ui/Textarea';
 import Button from '../components/ui/Button';
 import FeedbackButtons from '../components/FeedbackButtons';
-import { Activity, AlertCircle, Search } from 'lucide-react';
+import { Activity, AlertCircle, Search, X } from 'lucide-react';
 import { drugsApi } from '../lib/api/drugs';
 import { interactionsApi } from '../lib/api/interactions';
 import toast from 'react-hot-toast';
@@ -12,19 +10,22 @@ import type { Drug } from '../lib/types';
 
 interface InteractionFormData {
   selectedDrugs: string[];
-  context: string;
 }
 
 interface InteractionResult {
   id: string;
-  summary: string;
-  details: string;
+  query: string;
+  result: {
+    severity: string;
+    summary: string;
+    mechanism: string;
+    recommendations: string;
+  };
 }
 
 const DrugInteractions: React.FC = () => {
   const [formData, setFormData] = useState<InteractionFormData>({
-    selectedDrugs: [],
-    context: ''
+    selectedDrugs: []
   });
   
   const [drugs, setDrugs] = useState<Drug[]>([]);
@@ -51,42 +52,17 @@ const DrugInteractions: React.FC = () => {
     loadDrugs();
   }, []);
   
-  const drugOptions = drugs.map(drug => ({
-    value: drug.id,
-    label: `${drug.name} (${drug.active_ingredient})`
-  }));
-  
-  const handleDrugSelectionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const options = e.target.options;
-    const selectedValues: string[] = [];
-    
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].selected) {
-        selectedValues.push(options[i].value);
-      }
-    }
-    
+  const handleDrugSelection = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedOptions = Array.from(e.target.selectedOptions).map(option => option.value);
     setFormData(prev => ({
       ...prev,
-      selectedDrugs: selectedValues
-    }));
-  };
-  
-  const handleContextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      context: e.target.value
+      selectedDrugs: selectedOptions
     }));
   };
   
   const validate = (): boolean => {
     if (formData.selectedDrugs.length < 2) {
       toast.error('Wybierz co najmniej dwa leki do sprawdzenia interakcji');
-      return false;
-    }
-    
-    if (formData.context && formData.context.length > 50) {
-      toast.error('Kontekst nie może przekraczać 50 znaków');
       return false;
     }
     
@@ -102,19 +78,10 @@ const DrugInteractions: React.FC = () => {
     
     try {
       const response = await interactionsApi.createInteraction({
-        drug_ids: formData.selectedDrugs.map(id => parseInt(id)),
-        context: formData.context || undefined
+        drug_ids: formData.selectedDrugs.map(id => parseInt(id))
       });
       
-      const [summary, ...details] = response.result.split('\n\n');
-      
-      const interactionResult: InteractionResult = {
-        id: response.id,
-        summary: summary.trim(),
-        details: details.join('\n\n').trim()
-      };
-      
-      setResult(interactionResult);
+      setResult(response);
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -123,6 +90,19 @@ const DrugInteractions: React.FC = () => {
       }
     } finally {
       setSearching(false);
+    }
+  };
+  
+  const getSeverityColor = (severity: string) => {
+    switch (severity.toLowerCase()) {
+      case 'wysoki':
+        return 'text-error';
+      case 'umiarkowany':
+        return 'text-warning';
+      case 'niski':
+        return 'text-success';
+      default:
+        return 'text-gray-700';
     }
   };
   
@@ -158,7 +138,7 @@ const DrugInteractions: React.FC = () => {
             <span>Sprawdź Interakcje Leków</span>
           </CardTitle>
           <CardDescription>
-            Wybierz kilka leków, aby sprawdzić potencjalne interakcje, które mogą wpłynąć na leczenie.
+            Wybierz leki, aby sprawdzić potencjalne interakcje, które mogą wpłynąć na leczenie.
           </CardDescription>
         </CardHeader>
         
@@ -169,29 +149,20 @@ const DrugInteractions: React.FC = () => {
             </label>
             <select
               multiple
-              className="w-full min-h-[120px] rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 input-focus-animation"
-              onChange={handleDrugSelectionChange}
+              className="w-full min-h-[120px] rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 input-focus-animation"
               value={formData.selectedDrugs}
+              onChange={handleDrugSelection}
             >
-              {drugOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
+              {drugs.map(drug => (
+                <option key={drug.id} value={drug.id}>
+                  {drug.name} ({drug.active_ingredient})
                 </option>
               ))}
             </select>
             <p className="text-xs text-gray-500">
-              Przytrzymaj Ctrl (PC) lub Cmd (Mac), aby wybrać wiele leków
+              Przytrzymaj Ctrl (Windows) lub Cmd (Mac), aby wybrać wiele leków
             </p>
           </div>
-          
-          <Textarea
-            label="Dodatkowy Kontekst (Opcjonalnie)"
-            name="context"
-            placeholder="Szczególne okoliczności lub uwagi (max 50 znaków)"
-            value={formData.context}
-            onChange={handleContextChange}
-            fullWidth
-          />
           
           <Button 
             onClick={checkInteractions}
@@ -199,6 +170,7 @@ const DrugInteractions: React.FC = () => {
             fullWidth
             className="mt-4"
             leftIcon={<Search className="h-4 w-4" />}
+            disabled={formData.selectedDrugs.length < 2}
           >
             Sprawdź Interakcje
           </Button>
@@ -207,25 +179,31 @@ const DrugInteractions: React.FC = () => {
         {result && (
           <CardFooter className="flex flex-col items-start border-t pt-6">
             <div className="w-full p-4 rounded-lg mb-4" style={{ backgroundColor: 'rgba(var(--secondary), 0.05)' }}>
-              <h3 className="font-semibold text-lg flex items-center mb-2">
+              <h3 className="font-semibold text-lg flex items-center mb-4">
                 <Activity className="h-5 w-5 text-secondary mr-2" />
-                Analiza Interakcji
+                Analiza Interakcji: {result.query}
               </h3>
               
-              <div className="flex flex-col space-y-4">
+              <div className="space-y-4">
                 <div className="p-3 rounded-md bg-secondary/10">
-                  <div className="flex items-center gap-2 font-medium text-secondary">
-                    <AlertCircle className="h-4 w-4" />
-                    {result.summary}
+                  <div className="flex items-center gap-2 mb-2">
+                    <AlertCircle className={`h-5 w-5 ${getSeverityColor(result.result.severity)}`} />
+                    <span className={`font-medium ${getSeverityColor(result.result.severity)}`}>
+                      Poziom ryzyka: {result.result.severity}
+                    </span>
                   </div>
+                  <p className="text-gray-700">{result.result.summary}</p>
                 </div>
-                
-                {result.details && (
-                  <div>
-                    <h4 className="font-medium mb-1">Szczegóły:</h4>
-                    <p className="text-sm text-gray-700 whitespace-pre-wrap">{result.details}</p>
-                  </div>
-                )}
+
+                <div>
+                  <h4 className="font-medium mb-2">Mechanizm interakcji:</h4>
+                  <p className="text-sm text-gray-700">{result.result.mechanism}</p>
+                </div>
+
+                <div className="p-3 rounded-md bg-warning/10">
+                  <h4 className="font-medium mb-2">Zalecenia kliniczne:</h4>
+                  <p className="text-sm text-gray-700">{result.result.recommendations}</p>
+                </div>
               </div>
             </div>
             

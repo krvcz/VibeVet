@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+import logging
+from rest_framework import status
 
 # Load environment variables from .env file
 load_dotenv()
@@ -293,3 +295,45 @@ PASSWORD_HASHERS = [
 ]
 
 AUTHENTICATION_BACKENDS = ['users.backends.EmailBackend']
+
+# OpenRouter API Settings
+OPENROUTER_API_URL = os.getenv('OPENROUTER_API_URL', 'https://openrouter.ai/api/v1/chat/completions')
+OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', '')
+
+# Default model settings
+OPENROUTER_DEFAULT_MODEL = "openai/gpt-4o-mini"
+OPENROUTER_DEFAULT_PARAMS = {
+    "temperature": 0.7,
+    "max_tokens": 1500,
+    "top_p": 0.95,
+    "frequency_penalty": 0,
+    "presence_penalty": 0
+}
+
+# Add OpenRouter errors to exception handlers in common.utils
+EXCEPTION_HANDLERS = {
+    # Django and DRF exceptions
+    'ValidationError': (status.HTTP_400_BAD_REQUEST, logging.WARNING),
+    'ObjectDoesNotExist': (status.HTTP_404_NOT_FOUND, logging.INFO),
+    'PermissionDenied': (status.HTTP_403_FORBIDDEN, logging.WARNING),
+    'NotAuthenticated': (status.HTTP_401_UNAUTHORIZED, logging.INFO),
+    'AuthenticationFailed': (status.HTTP_401_UNAUTHORIZED, logging.WARNING),
+    'NotFound': (status.HTTP_404_NOT_FOUND, logging.INFO),
+    'MethodNotAllowed': (status.HTTP_405_METHOD_NOT_ALLOWED, logging.WARNING),
+    'Throttled': (status.HTTP_429_TOO_MANY_REQUESTS, logging.WARNING),
+    'ParseError': (status.HTTP_400_BAD_REQUEST, logging.WARNING),
+
+    # Custom application exceptions
+    'CustomDrugValidationError': (status.HTTP_400_BAD_REQUEST, logging.WARNING),
+    'DrugInteractionValidationError': (status.HTTP_400_BAD_REQUEST, logging.WARNING),
+    'TreatmentGuideValidationError': (status.HTTP_400_BAD_REQUEST, logging.WARNING),
+    'TreatmentGuideProcessingError': (status.HTTP_500_INTERNAL_SERVER_ERROR, logging.ERROR),
+    'RatingValidationError': (status.HTTP_400_BAD_REQUEST, logging.WARNING),
+    'DosageCalculationError': (status.HTTP_422_UNPROCESSABLE_ENTITY, logging.WARNING),
+    'UnitConversioError': (status.HTTP_422_UNPROCESSABLE_ENTITY, logging.WARNING),
+    'OpenRouterValidationError': (status.HTTP_400_BAD_REQUEST, logging.WARNING),
+    'OpenRouterProcessingError': (status.HTTP_502_BAD_GATEWAY, logging.ERROR),
+
+    # Default handler for unhandled exceptions
+    'Exception': (status.HTTP_500_INTERNAL_SERVER_ERROR, logging.ERROR)
+}

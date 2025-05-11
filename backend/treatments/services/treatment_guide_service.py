@@ -1,8 +1,9 @@
 import logging
-from django.db import transaction
-from django.contrib.auth import get_user_model
-from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth.models import AbstractUser
+from django.db.models.manager import Manager
+from typing import Optional
 from ..models import TreatmentGuide
+from common.services.openrouter_service import OpenRouterService
 
 logger = logging.getLogger('treatments')
 
@@ -12,8 +13,7 @@ class TreatmentGuideValidationError(Exception):
 class TreatmentGuideProcessingError(Exception):
     """Custom exception for AI processing errors."""
 
-
-def find_existing_treatment_guide(factors: dict) -> TreatmentGuide | None:
+def find_existing_treatment_guide(factors: dict) -> Optional[TreatmentGuide]:
     """
     Find existing treatment guide with the same factors, regardless of their order.
     
@@ -47,7 +47,7 @@ def find_existing_treatment_guide(factors: dict) -> TreatmentGuide | None:
 
 def create_treatment_guide(*, factors: dict, user: 'AbstractUser') -> dict:
     """
-    Create a treatment guide based on diagnostic factors.
+    Create a treatment guide based on diagnostic factors using AI analysis.
     
     Args:
         factors: Dictionary containing diagnostic factors (any key-value pairs)
@@ -64,13 +64,44 @@ def create_treatment_guide(*, factors: dict, user: 'AbstractUser') -> dict:
         # Log the incoming request
         logger.info("Processing treatment guide request with factors: %s", factors)
 
-        # TODO: In future implementation, add AI service integration here
-        # For now, return a mock response analyzing the provided factors
-        mock_result = analyze_factors_mock(factors)
+        # Initialize OpenRouter service
+        open_router = OpenRouterService()
+        
+        # Prepare the system message for AI
+        system_message = """Jesteś ekspertem od diagnostyki różnicowej zwierząt na podstawie objawów klinicznych.
+                    Analizuj podane objawy i przedstaw możliwe diagnozy różnicowe oraz zalecenia diagnostyczne. 
+                    Diagnozy mają być przedstawione w maksymalnie 5 punktach z krótkim opisem.
+                    Nie używaj znaków markdown. Po prostu plain text.
+                    Tylko i wyłączenie w punktach, nie dodawaj dodatkowego tekstu. Jeśli uważasz, że jest za mało danych, po prostu poproś o więcej informacji.
+                    Jeśli uważasz, że objawy nie odnoszą się do żadnej choroby, napisz, że nie można postawić diagnozy.
+                    Używaj tylko i wyłącznie języka polskiego."""
+        
+        # Prepare user message with factors
+        user_message = """Przeanalizuj podane objawy i przedstaw możliwe diagnozy różnicowe oraz zalecenia diagnostyczne. \n Objawy: \n """
+        for key, value in factors.items():
+            user_message += f"- {key}: {value}\n"
+
+        # Set model parameters
+        model_params = {
+            "temperature": 0.3,  # Lower temperature for more focused responses
+            "max_tokens": 1000,
+            "top_p": 0.95,
+            "frequency_penalty": 0,
+            "presence_penalty": 0
+        }
+
+        # Send request to OpenRouter
+        result = open_router.send_openrouter_request(
+            system_message=system_message,
+            user_message=user_message,
+            response_format=None,  # No specific format required
+            model_name="openai/gpt-4o-mini",  # Using GPT-4 for medical analysis
+            model_params=model_params
+        )
         
         # Create and save the treatment guide
         treatment_guide = TreatmentGuide.objects.create(
-            result=mock_result,
+            result=result,
             factors=factors,
             created_by=user
         )
@@ -88,18 +119,3 @@ def create_treatment_guide(*, factors: dict, user: 'AbstractUser') -> dict:
         raise TreatmentGuideValidationError(f"Invalid factors format: {str(e)}") from e
     except Exception as e:
         raise TreatmentGuideProcessingError(f"Error creating treatment guide: {str(e)}") from e
-
-def analyze_factors_mock(factors: dict) -> str:
-    """
-    Mock function to analyze diagnostic factors and return a preliminary assessment.
-    This will be replaced by actual AI integration in the future.
-    """
-    # Create a simple summary of provided factors
-    factor_summary = "\n".join(f"- {key}: {value}" for key, value in factors.items())
-    
-    return (
-        f"Preliminary assessment based on provided factors:\n\n"
-        f"{factor_summary}\n\n"
-        f"Note: This is a mock response. In the future, this will be replaced "
-        f"with actual AI-powered analysis."
-    )
