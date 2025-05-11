@@ -32,12 +32,11 @@ VetAssist odpowiada bezpośrednio na te problemy, dostarczając weterynarze wszy
 
 ### 3.2. Moduł kalkulatora dawkowania
 - Wybór leku z predefiniowanej listy
-- Wprowadzanie wagi zwierzęcia (liczba maksymalnie 3-cyfrowa)
+- Wprowadzanie wagi zwierzęcia (liczba maksymalnie 5-cyfrowa)
 - Wybór gatunku zwierzęcia z listy rozwijanej
 - Wybór docelowej jednostki miary z listy rozwijanej
 - Wyświetlanie wyniku obliczonej dawki (czas odpowiedzi poniżej 1 sekundy)
 - Przeliczanie jednostek zgodnie z ogólnymi zasadami konwersji (mg na g, g na ml, itp.)
-- Ocena użyteczności wyniku (kciuk w górę/kciuk w dół)
 
 ### 3.3. Moduł vademecum leczenia
 - Wprowadzanie słów kluczowych dotyczących czynników diagnostycznych
@@ -56,9 +55,6 @@ VetAssist odpowiada bezpośrednio na te problemy, dostarczając weterynarze wszy
 - Zbieranie ocen użytkowników (kciuk w górę/kciuk w dół)
 - Zapisywanie źródła oceny (który moduł)
 - Gromadzenie danych do analizy satysfakcji użytkowników
-
-### 3.6. Struktury danych
-- Ujednolicony schemat JSON dla leków z polami: "name", "activeIngredient", "species", "measurementValue", "measurementTarget", "contraindications" (każda wartość ograniczona do 20 znaków)
 
 ## 4. Granice produktu
 

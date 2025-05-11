@@ -1,0 +1,179 @@
+[
+  {
+    "model": "common.species",
+    "pk": 1,
+    "fields": {
+      "created_at": "2025-04-26T10:00:00Z",
+      "updated_at": "2025-04-26T10:00:00Z",
+      "created_by": 1,
+      "name": "Dog",
+      "scientific_name": "Canis lupus familiaris",
+      "description": "Domestic dog - man's best friend"
+    }
+  },
+  {
+    "model": "common.species",
+    "pk": 2,
+    "fields": {
+      "created_at": "2025-04-26T10:00:00Z",
+      "updated_at": "2025-04-26T10:00:00Z",
+      "created_by": 1,
+      "name": "Cat",
+      "scientific_name": "Felis catus",
+      "description": "Domestic cat - independent and graceful"
+    }
+  },
+  {
+    "model": "common.species",
+    "pk": 3,
+    "fields": {
+      "created_at": "2025-04-26T10:00:00Z",
+      "updated_at": "2025-04-26T10:00:00Z",
+      "created_by": 1,
+      "name": "Horse",
+      "scientific_name": "Equus caballus",
+      "description": "Domestic horse - noble and strong"
+    }
+  },
+  {
+    "model": "common.measurementunit",
+    "pk": 1,
+    "fields": {
+      "created_at": "2025-04-26T10:00:00Z",
+      "updated_at": "2025-04-26T10:00:00Z",
+      "created_by": 1,
+      "name": "Milligram",
+      "symbol": "mg",
+      "description": "One thousandth of a gram"
+    }
+  },
+  {
+    "model": "common.measurementunit",
+    "pk": 2,
+    "fields": {
+      "created_at": "2025-04-26T10:00:00Z",
+      "updated_at": "2025-04-26T10:00:00Z",
+      "created_by": 1,
+      "name": "Milliliter",
+      "symbol": "ml",
+      "description": "One thousandth of a liter"
+    }
+  },
+  {
+    "model": "common.systemlog",
+    "pk": 1,
+    "fields": {
+      "timestamp": "2025-04-26T10:00:00Z",
+      "log_level": "INFO",
+      "message": "System startup completed successfully",
+      "source": "SYSTEM",
+      "user": null
+    }
+  },
+  {
+    "model": "common.systemlog",
+    "pk": 2,
+    "fields": {
+      "timestamp": "2025-04-26T10:01:00Z",
+      "log_level": "WARNING",
+      "message": "High CPU usage detected",
+      "source": "MONITORING",
+      "user": null
+    }
+  },
+  {
+    "model": "treatments.treatmentguide",
+    "pk": 1,
+    "fields": {
+      "created_at": "2025-04-26T10:00:00Z",
+      "updated_at": "2025-04-26T10:00:00Z",
+      "created_by": 1,
+      "query": "What is the recommended treatment for canine arthritis?",
+      "result": "The recommended treatment for canine arthritis typically includes:\n1. Weight management\n2. Regular exercise\n3. Anti-inflammatory medications\n4. Physical therapy\n5. Dietary supplements",
+      "factors": {
+        "age": "senior",
+        "condition": "arthritis",
+        "species": "dog",
+        "severity": "moderate"
+      }
+    }
+  },
+  {
+    "model": "treatments.treatmentguide",
+    "pk": 2,
+    "fields": {
+      "created_at": "2025-04-26T10:30:00Z",
+      "updated_at": "2025-04-26T10:30:00Z",
+      "created_by": 1,
+      "query": "What is the best treatment for feline diabetes?",
+      "result": "Treatment for feline diabetes typically includes:\n1. Insulin therapy\n2. Dietary management\n3. Regular blood glucose monitoring\n4. Weight management\n5. Regular exercise",
+      "factors": {
+        "age": "adult",
+        "condition": "diabetes",
+        "species": "cat",
+        "severity": "moderate"
+      }
+    }
+  },
+  {
+    "model": "drugs.drug",
+    "pk": 1,
+    "fields": {
+      "name": "Rimadyl",
+      "active_ingredient": "Carprofen",
+      "species": 1,
+      "contraindications": "Liver disease, bleeding disorders",
+      "measurement_value": "100.00000",
+      "measurement_target": 1,
+      "created_at": "2025-04-26T00:00:00Z",
+      "updated_at": "2025-04-26T00:00:00Z",
+      "created_by": 1
+    }
+  },
+  {
+    "model": "drugs.drug",
+    "pk": 2,
+    "fields": {
+      "name": "Metacam",
+      "active_ingredient": "Meloxicam",
+      "species": 2,
+      "contraindications": "Kidney disease, gastrointestinal ulcers",
+      "measurement_value": "1.50000",
+      "measurement_target": 2,
+      "created_at": "2025-04-26T00:00:00Z",
+      "updated_at": "2025-04-26T00:00:00Z",
+      "created_by": 1
+    }
+  },
+  {
+    "model": "drugs.drug",
+    "pk": 3,
+    "fields": {
+      "name": "Phenylbutazone",
+      "active_ingredient": "Butazolidin",
+      "species": 3,
+      "contraindications": "Gastric ulcers, blood dyscrasia",
+      "measurement_value": "1000.00000",
+      "measurement_target": 1,
+      "created_at": "2025-04-26T00:00:00Z",
+      "updated_at": "2025-04-26T00:00:00Z",
+      "created_by": 1
+    }
+  },
+  {
+    "model": "drugs.customdrug",
+    "pk": 4,
+    "fields": {
+      "name": "Custom Antibiotic",
+      "active_ingredient": "Amoxicillin",
+      "species": 1,
+      "contraindications": "Penicillin allergy",
+      "measurement_value": "250.00000",
+      "measurement_target": 1,
+      "created_at": "2025-04-26T00:00:00Z",
+      "updated_at": "2025-04-26T00:00:00Z",
+      "created_by": 1,
+      "user": 1
+    }
+  }
+]

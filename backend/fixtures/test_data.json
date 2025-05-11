@@ -1,0 +1,193 @@
+[
+  {
+    "model": "common.species",
+    "pk": 1,
+    "fields": {
+      "created_at": "2025-05-10T10:00:00Z",
+      "updated_at": "2025-05-10T10:00:00Z",
+      "created_by": 1,
+      "name": "Dog",
+      "description": "Domestic dog species"
+    }
+  },
+  {
+    "model": "common.species",
+    "pk": 2,
+    "fields": {
+      "created_at": "2025-05-10T10:00:00Z",
+      "updated_at": "2025-05-10T10:00:00Z",
+      "created_by": 1,
+      "name": "Cat",
+      "description": "Domestic cat species"
+    }
+  },
+  {
+    "model": "common.unit",
+    "pk": 1,
+    "fields": {
+      "created_at": "2025-05-10T10:00:00Z",
+      "updated_at": "2025-05-10T10:00:00Z",
+      "created_by": 1,
+      "name": "Milligram",
+      "short_name": "mg",
+      "description": "Mass measurement in milligrams"
+    }
+  },
+  {
+    "model": "common.unit",
+    "pk": 2,
+    "fields": {
+      "created_at": "2025-05-10T10:00:00Z",
+      "updated_at": "2025-05-10T10:00:00Z",
+      "created_by": 1,
+      "name": "Kilogram",
+      "short_name": "kg",
+      "description": "Mass measurement in kilograms"
+    }
+  },
+  {
+    "model": "drugs.drug",
+    "pk": 1,
+    "fields": {
+      "created_at": "2025-05-10T10:00:00Z",
+      "updated_at": "2025-05-10T10:00:00Z",
+      "created_by": 1,
+      "name": "Carprofen",
+      "active_ingredient": "Carprofen",
+      "species": 1,
+      "contraindications": "Liver disease, bleeding disorders",
+      "measurement_value": "100.00000",
+      "measurement_unit": 1,
+      "per_weight_value": "2.00000",
+      "per_weight_unit": 2
+    }
+  },
+  {
+    "model": "drugs.drug",
+    "pk": 2,
+    "fields": {
+      "created_at": "2025-05-10T10:00:00Z",
+      "updated_at": "2025-05-10T10:00:00Z",
+      "created_by": 1,
+      "name": "Meloxicam",
+      "active_ingredient": "Meloxicam",
+      "species": 2,
+      "contraindications": "Kidney disease, GI ulcers",
+      "measurement_value": "1.50000",
+      "measurement_unit": 1,
+      "per_weight_value": "0.10000",
+      "per_weight_unit": 2
+    }
+  },
+  {
+    "model": "drugs.customdrug",
+    "pk": 1,
+    "fields": {
+      "created_at": "2025-05-10T10:00:00Z",
+      "updated_at": "2025-05-10T10:00:00Z",
+      "created_by": 1,
+      "user": 1,
+      "name": "Custom Antibiotic",
+      "active_ingredient": "Amoxicillin",
+      "species": 1,
+      "contraindications": "Penicillin allergy",
+      "measurement_value": "250.00000",
+      "measurement_unit": 1,
+      "per_weight_value": "10.00000",
+      "per_weight_unit": 2
+    }
+  },
+  {
+    "model": "treatments.treatmentguide",
+    "pk": 1,
+    "fields": {
+      "created_at": "2025-05-10T10:00:00Z",
+      "updated_at": "2025-05-10T10:00:00Z",
+      "created_by": 1,
+      "query": "What is the recommended treatment for canine arthritis?",
+      "result": "1. NSAIDs like Carprofen (100mg/kg)\n2. Physical therapy\n3. Weight management\n4. Regular moderate exercise\n5. Joint supplements",
+      "factors": {
+        "species": "dog",
+        "condition": "arthritis",
+        "age": "senior",
+        "severity": "moderate"
+      }
+    }
+  },
+  {
+    "model": "treatments.treatmentguide",
+    "pk": 2,
+    "fields": {
+      "created_at": "2025-05-10T10:00:00Z",
+      "updated_at": "2025-05-10T10:00:00Z",
+      "created_by": 1,
+      "query": "What is the treatment for feline asthma?",
+      "result": "1. Inhaled corticosteroids\n2. Bronchodilators\n3. Environmental modifications\n4. Regular monitoring\n5. Stress reduction",
+      "factors": {
+        "species": "cat",
+        "condition": "asthma",
+        "age": "adult",
+        "severity": "mild"
+      }
+    }
+  },
+  {
+    "model": "interactions.druginteraction",
+    "pk": 1,
+    "fields": {
+      "created_at": "2025-05-10T10:00:00Z",
+      "updated_at": "2025-05-10T10:00:00Z",
+      "created_by": 1,
+      "query": "What are the interactions between Carprofen and Meloxicam?",
+      "result": "Concurrent use of Carprofen and Meloxicam is contraindicated due to increased risk of gastrointestinal ulceration and bleeding.",
+      "context": "NSAID interaction",
+      "drugs": [1, 2]
+    }
+  },
+  {
+    "model": "common.rating",
+    "pk": 1,
+    "fields": {
+      "created_at": "2025-05-10T10:00:00Z",
+      "updated_at": "2025-05-10T10:00:00Z",
+      "created_by": 1,
+      "content_type": ["treatments", "treatmentguide"],
+      "object_id": 1,
+      "rating": "up"
+    }
+  },
+  {
+    "model": "common.rating",
+    "pk": 2,
+    "fields": {
+      "created_at": "2025-05-10T10:00:00Z",
+      "updated_at": "2025-05-10T10:00:00Z",
+      "created_by": 1,
+      "content_type": ["interactions", "druginteraction"],
+      "object_id": 1,
+      "rating": "up"
+    }
+  },
+  {
+    "model": "common.systemlog",
+    "pk": 1,
+    "fields": {
+      "timestamp": "2025-05-10T10:00:00Z",
+      "log_level": "INFO",
+      "message": "System initialization completed",
+      "source": "SYSTEM",
+      "user": 1
+    }
+  },
+  {
+    "model": "common.systemlog",
+    "pk": 2,
+    "fields": {
+      "timestamp": "2025-05-10T10:01:00Z",
+      "log_level": "WARNING",
+      "message": "High API usage detected",
+      "source": "MONITORING",
+      "user": null
+    }
+  }
+]
