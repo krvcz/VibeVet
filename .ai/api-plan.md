@@ -23,15 +23,37 @@
   - `search` (string, optional for name or active ingredient)
 - **Response JSON:**
     ```json
-    {
+    { 
+      "count": 1,
+      "next": null,
+      "previous": null,
       "results": [
-          { "id": 1, "name": "DrugA", "active_ingredient": "IngredientX", "species": 1, "measurement_value": "10.00000", "measurement_target": 1 },
+          { "id": 1,
+           "name": "DrugA",
+            "active_ingredient": "IngredientX",
+             "species": {
+                          "id": 1,
+                           "name": "Dog",
+                            "description": "Domestic dog - man's best friend"},
+                             "contraindications": "Penicillin allergy", "measurement_value": "10.00000", 
+           "measurement_unit": { 
+                                "id": 1,
+                                "name": "Milligram",
+                                "short_name": "mg"
+                              } ,
+           "per_weight_value": "1.00000",
+           "per_weight_unit": {
+                              "id": 3,
+                              "name": "Kilogram",
+                              "short_name": "kg"
+                              }
+        },
           ...
       ],
-      "pagination": { "page": 1, "limit": 20, "total": 100 }
     }
     ```
 - **Success Codes:** 200 OK
+- **Error Codes:** 404 Not Found, 401 Unauthorized
 
 ### B. Custom Drug Resource
 Endpoints mirror CRUD operations:
@@ -47,17 +69,150 @@ Endpoints mirror CRUD operations:
       "species": 1,
       "contraindications": "None",
       "measurement_value": "5.00000",
-      "measurement_target": 1
+      "measurement_unit": 1,
+      "per_weight_value": "1.00000",
+      "per_weight_unit": 1
     }
     ```
-- **Response JSON:** Newly created custom drug object.  
+- **Response JSON:**
+  ```json
+    {
+    "id": 5,
+    "name": "CustomDrugA",
+    "active_ingredient": "IngredientY",
+    "species": 1,
+    "contraindications": "None",
+    "measurement_value": "5.00000",
+    "measurement_unit": 1,
+    "per_weight_value": "1.00000",
+    "per_weight_unit": 1
+  }
+  ```
 - **Success Codes:** 201 Created  
 - **Error Codes:** 400 Bad Request, 401 Unauthorized
 
-#### 2. List, Retrieve, Update, and Delete Custom Drug  
-- **Methods:** GET, PUT/PATCH, DELETE  
-- **URL Pattern:** `/api/custom-drugs/{id}`  
-- **Authorization:** Only the owner of the custom drug may update or delete.
+
+#### 2. List Custom Drug
+- **Method:** GET  
+- **URL:** `/api/custom-drugs`  
+- **Description:** Retrieve a list of standard drugs.
+- **Query Parameters:** 
+  - `page` (int, optional)  
+  - `limit` (int, optional)  
+  - `search` (string, optional for name or active ingredient)
+- **Response JSON:**
+    ```json
+    {
+      "count": 1,
+      "next": null,
+      "previous": null,
+      "results": [
+          { 
+            "id": 5,
+             "name": "CustomDrugA",
+              "active_ingredient": "IngredientY",
+              "species": {
+                            "id": 1,
+                             "name": "Dog",
+                            "description": "Domestic dog - man's best friend"
+                          },
+              "contraindications": "None",
+              "measurement_value": "10.00000",
+              "measurement_unit": { 
+                                    "id": 1,
+                                    "name": "Milligram",
+                                    "short_name": "mg"
+                                  } ,
+              "per_weight_value": "1.00000",
+              "per_weight_unit": {
+                              "id": 3,
+                              "name": "Kilogram",
+                              "short_name": "kg"
+                              }                  
+        },
+          ...
+      ]
+    }
+    ```
+- **Success Codes:** 200 OK
+- **Error Codes:** 404 Not Found, 401 Unauthorized
+
+#### 3. Get Custom Drug
+- **Method:** GET  
+- **URL:** `/api/custom-drugs/{id}`  
+- **Description:** Get custom drug by its pk.
+- **Path Parameters:** 
+  - `id` (int)  
+- **Request:**
+    ```http
+    /api/custom-drugs/4
+    ```
+- **Response JSON:**
+    ```json
+      { 
+        "id": 4,
+        "name": "CustomDrugA",
+        "active_ingredient": "IngredientY",
+        "species": {
+                      "id": 1,
+                       "name": "Dog", 
+                       "description": "Domestic dog - man's best friend"
+                    },
+        "contraindications": "None",
+        "measurement_value": "10.00000",
+        "measurement_unit": { 
+                              "id": 1,
+                              "name": "Milligram",
+                              "short_name": "mg"
+                            },
+        "per_weight_value": "1.00000",
+        "per_weight_unit": {
+                              "id": 3,
+                              "name": "Kilogram",
+                              "short_name": "kg"
+                              }
+        }
+    ```
+- **Success Codes:** 200 OK
+- **Error Codes:** 404 Not Found, 401 Unauthorized
+
+#### 4. Update Custom Drug
+- **Method:** PUT/PATCH 
+- **URL:** `/api/custom-drugs/{id}`  
+- **Description:** Update custom drug by its pk.
+- **Path Parameters:** 
+  - `id` (int)  
+- **Request:**
+    ```http
+    /api/custom-drugs/4
+    ```
+- **Response JSON:**
+    ```json
+      { "id": 4, "name": "CustomDrugA",
+        "active_ingredient": "IngredientY",
+        "species": 1,
+        "contraindications": "None",
+        "measurement_value": "10.00000",
+        "measurement_unit": 1,
+        "per_weight_value": "1.00000",
+        "per_weight_unit": 1
+        }
+    ```
+- **Success Codes:** 200 OK
+- **Error Codes:** 404 Not Found, 401 Unauthorized
+
+#### 5. Update Custom Drug
+- **Method:** DELETE
+- **URL:** `/api/custom-drugs/{id}`  
+- **Description:** Delete custom drug by its pk.
+- **Path Parameters:** 
+  - `id` (int)  
+- **Request:**
+    ```http
+    /api/custom-drugs/4
+  ```
+- **Success Codes:** 204 OK
+- **Error Codes:** 404 Not Found, 401 Unauthorized
 
 ### C. Drug Interaction Resource
 #### 1. Create Drug Interaction Query
@@ -74,15 +229,12 @@ Endpoints mirror CRUD operations:
 - **Response JSON:**
     ```json
     {
-      "id": 10,
-      "query": "DrugA, DrugC, DrugE",
-      "result": "AI generated interaction details...",
-      "positive_rating": 0,
-      "negative_rating": 0,
-      "created_at": "2025-04-15T14:30:00Z"
+      "id": 28,
+      "query": "Metacam, Phenylbutazone, Rimadyl",
+      "result": "Mock interaction analysis for: Metacam, Phenylbutazone, Rimadyl Context: 123"
     }
     ```
-- **Success Codes:** 201 Created  
+- **Success Codes:** 201 Created, 200 OK
 - **Error Codes:** 400 Bad Request, 401 Unauthorized
 
 #### 2. Rate Drug Interaction
@@ -102,13 +254,7 @@ Endpoints mirror CRUD operations:
     }
     ```
 - **Success Codes:** 200 OK
-
-#### 3. Get Drug Interaction History
-- **Method:** GET  
-- **URL:** `/api/drug-interactions`  
-- **Description:** Retrieve a paginated list of drug interaction queries for the authenticated user.
-- **Query Parameters:** `page`, `limit`
-- **Success Codes:** 200 OK
+- **Error Codes:** 400 Bad Request, 401 Unauthorized, 404 NotFound
 
 ### E. Dosage Calculator Resource
 #### 1. Calculate Dosage
@@ -132,7 +278,6 @@ Endpoints mirror CRUD operations:
       "unit": "mg"
     }
     ```
-- **Performance Requirement:** Response time under 1 second.
 - **Success Codes:** 200 OK  
 - **Error Codes:** 400 Bad Request, 422 Unprocessable Entity
 
@@ -167,12 +312,9 @@ Endpoints mirror CRUD operations:
     {
       "id": 7,
       "result": "Potential conditions: ConditionA, ConditionB...",
-      "factors": { "temperature": 39.5, "heart_rate": 110 },
-      "positive_rating": 0,
-      "negative_rating": 0
+      "factors": { "temperature": 39.5, "heart_rate": 110 }
     }
     ```
-- **Performance Requirement:** AI response time within 10 seconds.
 - **Success Codes:** 201 Created  
 - **Error Codes:** 400 Bad Request, 401 Unauthorized
 
@@ -193,37 +335,103 @@ Endpoints mirror CRUD operations:
     }
     ```
 - **Success Codes:** 200 OK
+- **Error Codes:** 400 Bad Request, 401 Unauthorized
 
 ### G. User Search History Resource
 #### 1. Get Search History
 - **Method:** GET  
 - **URL:** `/api/search-history`  
 - **Description:** Retrieve paginated search history records for the authenticated user (for both drug interactions and dosage/treatment queries).
-- **Query Parameters:** `page`, `limit`, `module` (optional filter)
+- **Query Parameters:** `page`, `limit`, `module`, `from_date`, `to_date`
+- **Request:**
+    ```http
+    /api/search-history/
+    ```
+- **Response JSON:**
+    ```json
+      {
+    "count": 1,
+    "next": "http://localhost:8000/api/search-history/?limit=1&page=2",
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "module": "drug-interaction",
+            "query": "Drug interaction query for drug IDs: [1, 2]",
+            "timestamp": "2025-04-28T08:13:47.767484Z"
+        }
+    ]
+}
+    ```
 - **Success Codes:** 200 OK
+- **Error Codes:** 400 Bad Request, 401 Unauthorized
 
-## 3. Authentication and Authorization
-- **Authentication Mechanism:**  
-  - JSON Web Tokens (JWT) are used for stateless token-based authentication.  
-  - Endpoints under `/api/auth/` are public while others require a valid token sent via the `Authorization: Bearer <token>` header.
-- **Authorization Rules:**  
-  - Users can only access/modify their own records (e.g., CustomDrug, UserSearchHistory).  
-  - Admin endpoints (e.g., viewing SystemLogs) are protected by role-based access.
 
-## 4. Validation and Business Logic
-- **Field Validations:**  
-  - Email format validation and unique constraint.  
-  - Password minimum length (8 characters).  
-  - Animal weight must be a positive integer (up to 3 digits).  
-  - Input lengths for names, context fields, and constraints per DB schema.
-- **Business Logic Implementation:**  
-  - Dosage Calculator validates the selected drug and units and performs unit conversions.  
-  - Drug Interaction and Treatment Guide endpoints interface with Openrouter.ai ensuring maximum response time constraints (10 seconds).  
-  - Ratings endpoints update counts while ensuring the request comes from an authorized user.
-- **Additional Considerations:**  
-  - Pagination, filtering, and sorting support for list endpoints.  
-  - Rate limiting and logging (via SystemLog) are integrated as middleware.
-  
+### G. Common Resource
+#### 1. Get Species
+- **Method:** GET  
+- **URL:** `/api/species`  
+- **Description:** Retrieve paginated species for the authenticated user.
+
+- **Request:**
+    ```http
+    /api/species/
+    ```
+- **Response JSON:**
+    ```json
+      {
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 2,
+            "name": "Cat",
+            "description": "Domestic cat species"
+        },
+        {
+            "id": 1,
+            "name": "Dog",
+            "description": "Domestic dog species"
+        }
+    ]
+}
+    ```
+- **Success Codes:** 200 OK
+- **Error Codes:** 400 Bad Request, 401 Unauthorized
+
+
+#### 2. Get Units
+- **Method:** GET  
+- **URL:** `/api/units`  
+- **Description:** Retrieve paginated units for the authenticated user.
+
+- **Request:**
+    ```http
+    /api/units/
+    ```
+- **Response JSON:**
+    ```json
+   {
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 2,
+            "name": "Kilogram",
+            "short_name": "kg"
+        },
+        {
+            "id": 1,
+            "name": "Milligram",
+            "short_name": "mg"
+        }
+    ]
+}
+    ```
+- **Success Codes:** 200 OK
+- **Error Codes:** 400 Bad Request, 401 Unauthorized
 ----
 
 All endpoints and validations are designed in line with the provided DB schema, PRD, and technology stack (Django, PostgreSQL, Openrouter.ai for AI calls, TypeScript/React for the frontend via Astro). This plan ensures a structured REST API that adheres to business logic, performance and security requirements.

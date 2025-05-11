@@ -2,82 +2,89 @@
 
 ## 1. Tabele, Kolumny, Typy Danych i Ograniczenia
 
-### User
+### User (CustomUser)
 | Column       | Type        | Constraints                |
 |-------------|-------------|----------------------------|
 | id          | SERIAL      | PRIMARY KEY                |
-| email       | VARCHAR(50) | NOT NULL, UNIQUE          |
-| password    | VARCHAR(100)| NOT NULL                  |
-| isActive    | BOOLEAN     | NOT NULL, DEFAULT TRUE    |
-| createdAt   | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
-| updatedAt   | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
-| createdBy   | INT         | NULL                      |
+| email       | VARCHAR(254) | NOT NULL, UNIQUE          |
+| password    | VARCHAR(128)| NOT NULL                  |
+| is_active   | BOOLEAN     | NOT NULL, DEFAULT TRUE    |
+| is_staff    | BOOLEAN     | NOT NULL, DEFAULT FALSE   |
+| is_superuser| BOOLEAN     | NOT NULL, DEFAULT FALSE   |
+| date_joined | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
+| last_login  | TIMESTAMP   | NULL                      |
+| first_name  | VARCHAR(150)| NOT NULL                  |
+| last_name   | VARCHAR(150)| NOT NULL                  |
 
 ### Species
 | Column       | Type        | Constraints                |
 |-------------|-------------|----------------------------|
 | id          | SERIAL      | PRIMARY KEY                |
 | name        | VARCHAR(20) | NOT NULL, UNIQUE          |
-| createdAt   | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
-| updatedAt   | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
-| createdBy   | INT         | NOT NULL, REFERENCES User(id) |
+| description | TEXT        | NULL                      |
+| created_at  | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
+| updated_at  | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
+| created_by  | INT         | NOT NULL, REFERENCES User(id) |
 
-### MeasurementUnit
+### Unit (MeasurementUnit)
 | Column       | Type        | Constraints                |
 |-------------|-------------|----------------------------|
 | id          | SERIAL      | PRIMARY KEY                |
-| shortName   | VARCHAR(5)  | NOT NULL, UNIQUE          |
+| short_name  | VARCHAR(5)  | NOT NULL, UNIQUE          |
 | name        | VARCHAR(20) | NOT NULL, UNIQUE          |
-| createdAt   | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
-| updatedAt   | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
-| createdBy   | INT         | NOT NULL, REFERENCES User(id) |
+| description | TEXT        | NULL                      |
+| created_at  | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
+| updated_at  | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
+| created_by  | INT         | NOT NULL, REFERENCES User(id) |
 
 ### Drug
 | Column             | Type        | Constraints                |
 |-------------------|-------------|----------------------------|
 | id                | SERIAL      | PRIMARY KEY                |
 | name              | VARCHAR(20) | NOT NULL                  |
-| activeIngredient  | VARCHAR(20) | NOT NULL                  |
+| active_ingredient | VARCHAR(20) | NOT NULL                  |
 | species_id        | INT         | NOT NULL, REFERENCES Species(id) |
 | contraindications | VARCHAR(100)| NULL                      |
-| measurementValue  | NUMERIC(10,5)| NOT NULL                  |
-| measurementTarget_id | INT      | NOT NULL, REFERENCES MeasurementUnit(id) |
-| createdAt         | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
-| updatedAt         | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
-| createdBy         | INT         | NOT NULL, REFERENCES User(id) |
+| measurement_value | NUMERIC(10,5)| NOT NULL                  |
+| measurement_unit_id | INT      | NOT NULL, REFERENCES Unit(id) |
+| per_weight_value  | NUMERIC(10,5)| NOT NULL                  |
+| per_weight_unit_id | INT       | NOT NULL, REFERENCES Unit(id) |
+| created_at        | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
+| updated_at        | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
+| created_by        | INT         | NOT NULL, REFERENCES User(id) |
 
 ### CustomDrug
 | Column             | Type        | Constraints                |
 |-------------------|-------------|----------------------------|
 | id                | SERIAL      | PRIMARY KEY                |
 | name              | VARCHAR(20) | NOT NULL                  |
-| activeIngredient  | VARCHAR(20) | NOT NULL                  |
+| active_ingredient | VARCHAR(20) | NOT NULL                  |
 | species_id        | INT         | NOT NULL, REFERENCES Species(id) |
 | contraindications | VARCHAR(100)| NULL                      |
-| measurementValue  | NUMERIC(10,5)| NOT NULL                  |
-| measurementTarget_id | INT      | NOT NULL, REFERENCES MeasurementUnit(id) |
+| measurement_value | NUMERIC(10,5)| NOT NULL                  |
+| measurement_unit_id | INT      | NOT NULL, REFERENCES Unit(id) |
+| per_weight_value  | NUMERIC(10,5)| NOT NULL                  |
+| per_weight_unit_id | INT       | NOT NULL, REFERENCES Unit(id) |
 | user_id           | INT         | NOT NULL, REFERENCES User(id) |
-| createdAt         | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
-| updatedAt         | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
-| createdBy         | INT         | NOT NULL, REFERENCES User(id) |
+| created_at        | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
+| updated_at        | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
+| created_by        | INT         | NOT NULL, REFERENCES User(id) |
 
-### DrugInteractions
+### DrugInteraction (DrugInteractions)
 | Column           | Type         | Constraints                |
 |-----------------|--------------|----------------------------|
 | id              | SERIAL       | PRIMARY KEY                |
 | query           | TEXT         | NOT NULL                  |
 | result          | TEXT         | NOT NULL                  |
 | context         | VARCHAR(50)  | NULL                      |
-| positiveRating  | INT          | NOT NULL, DEFAULT 0       |
-| negativeRating  | INT          | NOT NULL, DEFAULT 0       |
-| createdAt       | TIMESTAMP    | NOT NULL, DEFAULT NOW()   |
-| updatedAt       | TIMESTAMP    | NOT NULL, DEFAULT NOW()   |
-| createdBy       | INT          | NOT NULL, REFERENCES User(id) |
+| created_at      | TIMESTAMP    | NOT NULL, DEFAULT NOW()   |
+| updated_at      | TIMESTAMP    | NOT NULL, DEFAULT NOW()   |
+| created_by      | INT          | NOT NULL, REFERENCES User(id) |
 
-### DrugInteractions_Drugs
+### DrugInteraction_Drugs (relacja ManyToMany)
 | Column               | Type | Constraints                |
 |---------------------|------|----------------------------|
-| drugInteractions_id | INT  | NOT NULL, REFERENCES DrugInteractions(id) |
+| druginteraction_id  | INT  | NOT NULL, REFERENCES DrugInteraction(id) |
 | drug_id             | INT  | NOT NULL, REFERENCES Drug(id) |
 
 ### TreatmentGuide
@@ -87,18 +94,27 @@
 | query           | TEXT         | NOT NULL                  |
 | result          | TEXT         | NOT NULL                  |
 | factors         | JSONB        | NOT NULL                  |
-| positiveRating  | INT          | NOT NULL, DEFAULT 0       |
-| negativeRating  | INT          | NOT NULL, DEFAULT 0       |
-| createdAt       | TIMESTAMP    | NOT NULL, DEFAULT NOW()   |
-| updatedAt       | TIMESTAMP    | NOT NULL, DEFAULT NOW()   |
-| createdBy       | INT          | NOT NULL, REFERENCES User(id) |
+| created_at      | TIMESTAMP    | NOT NULL, DEFAULT NOW()   |
+| updated_at      | TIMESTAMP    | NOT NULL, DEFAULT NOW()   |
+| created_by      | INT          | NOT NULL, REFERENCES User(id) |
 
-### SystemLogs
+### Rating
+| Column           | Type         | Constraints                |
+|-----------------|--------------|----------------------------|
+| id              | SERIAL       | PRIMARY KEY                |
+| content_type_id | INT          | NOT NULL, REFERENCES ContentType(id) |
+| object_id       | INT          | NOT NULL                  |
+| rating          | VARCHAR(4)   | NOT NULL                  |
+| created_at      | TIMESTAMP    | NOT NULL, DEFAULT NOW()   |
+| updated_at      | TIMESTAMP    | NOT NULL, DEFAULT NOW()   |
+| created_by      | INT          | NOT NULL, REFERENCES User(id) |
+
+### SystemLog (SystemLogs)
 | Column       | Type        | Constraints                |
 |-------------|-------------|----------------------------|
 | id          | SERIAL      | PRIMARY KEY                |
 | timestamp   | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
-| logLevel    | VARCHAR(10) | NOT NULL                  |
+| log_level   | VARCHAR(10) | NOT NULL                  |
 | message     | TEXT        | NOT NULL                  |
 | source      | VARCHAR(20) | NOT NULL                  |
 | user_id     | INT         | NULL, REFERENCES User(id) |
@@ -107,11 +123,11 @@
 | Column       | Type        | Constraints                |
 |-------------|-------------|----------------------------|
 | id          | SERIAL      | PRIMARY KEY                |
-| user_id     | INT         | NOT NULL, REFERENCES User(id) |
 | module      | VARCHAR(20) | NOT NULL                  |
 | query       | TEXT        | NOT NULL                  |
-| createdAt   | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
-| updatedAt   | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
+| created_at  | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
+| updated_at  | TIMESTAMP   | NOT NULL, DEFAULT NOW()   |
+| created_by  | INT         | NOT NULL, REFERENCES User(id) |
 
 ## 2. Relacje między tabelami
 
@@ -127,25 +143,37 @@
    - Jeden gatunek może mieć wiele przypisanych niestandardowych leków
    - Każdy niestandardowy lek jest przypisany dokładnie do jednego gatunku
 
-4. **MeasurementUnit do Drug**: Jeden-do-Wielu
+4. **Unit do Drug (measurement_unit)**: Jeden-do-Wielu
    - Jedna jednostka miary może być używana dla wielu leków
-   - Każdy lek używa dokładnie jednej jednostki miary jako cel
+   - Każdy lek używa dokładnie jednej jednostki miary dla wartości pomiaru
 
-5. **MeasurementUnit do CustomDrug**: Jeden-do-Wielu
+5. **Unit do Drug (per_weight_unit)**: Jeden-do-Wielu
+   - Jedna jednostka miary może być używana dla wielu leków
+   - Każdy lek używa dokładnie jednej jednostki miary dla wartości na wagę
+
+6. **Unit do CustomDrug (measurement_unit)**: Jeden-do-Wielu
    - Jedna jednostka miary może być używana dla wielu niestandardowych leków
-   - Każdy niestandardowy lek używa dokładnie jednej jednostki miary jako cel
+   - Każdy niestandardowy lek używa dokładnie jednej jednostki miary dla wartości pomiaru
 
-6. **DrugInteractions do Drug**: Wiele-do-Wielu (przez DrugInteractions_Drugs)
+7. **Unit do CustomDrug (per_weight_unit)**: Jeden-do-Wielu
+   - Jedna jednostka miary może być używana dla wielu niestandardowych leków
+   - Każdy niestandardowy lek używa dokładnie jednej jednostki miary dla wartości na wagę
+
+8. **DrugInteraction do Drug**: Wiele-do-Wielu (przez DrugInteraction_Drugs)
    - Jeden rekord interakcji leków może obejmować wiele leków
    - Jeden lek może być zaangażowany w wiele rekordów interakcji leków
 
-7. **User do UserSearchHistory**: Jeden-do-Wielu
+9. **User do UserSearchHistory**: Jeden-do-Wielu
    - Jeden użytkownik może mieć wiele rekordów historii wyszukiwania
    - Każdy rekord historii wyszukiwania należy dokładnie do jednego użytkownika
 
-8. **User do SystemLogs**: Jeden-do-Wielu (opcjonalnie)
-   - Jeden użytkownik może być powiązany z wieloma logami systemowymi
-   - Każdy log systemowy może być powiązany z jednym lub żadnym użytkownikiem (jeśli jest generowany przez system)
+10. **User do SystemLog**: Jeden-do-Wielu (opcjonalnie)
+    - Jeden użytkownik może być powiązany z wieloma logami systemowymi
+    - Każdy log systemowy może być powiązany z jednym lub żadnym użytkownikiem (jeśli jest generowany przez system)
+
+11. **ContentType do Rating**: Jeden-do-Wielu
+    - Jeden typ zawartości może mieć wiele ocen
+    - Każda ocena jest powiązana z dokładnie jednym typem zawartości
 
 ## 3. Indeksy
 
@@ -153,93 +181,97 @@
    - Indeks na `email` (już obsługiwany przez ograniczenie UNIQUE)
 
 2. **Tabela Drug**:
-   - Indeks na `name` dla szybszego wyszukiwania leków
-   - Indeks na `activeIngredient` dla wyszukiwań według składnika
-   - Indeks na `species_id` dla filtrowanych wyszukiwań według gatunku
+   - Indeks na `name` 
+   - Indeks na `active_ingredient`
 
 3. **Tabela CustomDrug**:
-   - Indeks na `name` dla szybszego wyszukiwania leków
-   - Indeks na `activeIngredient` dla wyszukiwań według składnika
-   - Indeks złożony na `user_id` i `species_id` dla filtrowanych wyszukiwań
+   - Indeks na `user_id`
 
-4. **Tabela DrugInteractions**:
-   - Indeks na `createdAt` dla zapytań opartych na czasie
-   - Indeks na `createdBy` dla historii interakcji użytkownika
+4. **Tabela DrugInteraction**:
+   - Indeks na `created_by`
 
 5. **Tabela TreatmentGuide**:
    - Indeks GIN na `factors` dla wydajnych zapytań JSONB
-   - Indeks na `createdAt` dla zapytań opartych na czasie
-   - Indeks na `createdBy` dla historii przewodników leczenia użytkownika
+   - Indeks na `created_by`
 
-6. **Tabela SystemLogs**:
-   - Indeks na `timestamp` dla zapytań o logi oparte na czasie
-   - Indeks na `source` dla pobierania logów specyficznych dla modułu
-   - Indeks na `logLevel` dla filtrowania według poziomu ważności
-   - Indeks na `user_id` dla pobierania logów specyficznych dla użytkownika
+6. **Tabela Rating**:
+   - Indeks na `content_type_id, object_id`
+   - Indeks na `created_by`
+   - Ograniczenie unique_together dla `created_by, content_type_id, object_id`
 
-7. **Tabela UserSearchHistory**:
-   - Indeks na `user_id` dla szybszego pobierania historii specyficznej dla użytkownika
-   - Indeks na `module` dla pobierania historii specyficznej dla modułu
-   - Indeks złożony na `user_id` i `module` dla filtrowanego pobierania historii
-   - Indeks na `createdAt` dla pobierania historii uporządkowanej według czasu
+7. **Tabela SystemLog**:
+   - Indeks na `timestamp`
+   - Indeks na `source`
+   - Indeks na `log_level`
+   - Indeks na `user_id`
+
+8. **Tabela UserSearchHistory**:
+   - Indeks na `-created_at`
+   - Indeks na `created_by, -created_at`
+   - Indeks na `created_by, module, -created_at`
+   - Indeks na `module`
 
 ## 4. Polityki bezpieczeństwa na poziomie wierszy PostgreSQL (RLS)
 
 ### Polityki RLS dla tabeli CustomDrug
 
 ```sql
-ALTER TABLE "CustomDrug" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "custom_drug" ENABLE ROW LEVEL SECURITY;
 
 -- Policy that allows users to see only their own custom drugs
-CREATE POLICY custom_drug_user_isolation ON "CustomDrug"
+CREATE POLICY custom_drug_user_isolation ON "custom_drug"
     USING (user_id = current_user_id());
     
 -- Policy that allows administrators to see all custom drugs
-CREATE POLICY custom_drug_admin_access ON "CustomDrug"
+CREATE POLICY custom_drug_admin_access ON "custom_drug"
     USING (current_user_has_role('admin'));
 ```
 
 ### Polityki RLS dla tabeli UserSearchHistory
 
 ```sql
-ALTER TABLE "UserSearchHistory" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "user_search_history" ENABLE ROW LEVEL SECURITY;
 
 -- Policy that allows users to see only their own search history
-CREATE POLICY search_history_user_isolation ON "UserSearchHistory"
-    USING (user_id = current_user_id());
+CREATE POLICY search_history_user_isolation ON "user_search_history"
+    USING (created_by_id = current_user_id());
     
 -- Policy that allows administrators to see all search history
-CREATE POLICY search_history_admin_access ON "UserSearchHistory"
+CREATE POLICY search_history_admin_access ON "user_search_history"
     USING (current_user_has_role('admin'));
 ```
 
 ## 5. Dodatkowe uwagi i decyzje projektowe
 
 1. **Pola audytowe**:
-   - Wszystkie tabele oprócz SystemLogs zawierają standardowe pola audytowe (createdAt, updatedAt, createdBy)
-   - SystemLogs ma pole timestamp zamiast createdAt, ponieważ jest to tabela logów
+   - Większość tabel dziedziczy z BaseAuditModel, który zapewnia standardowe pola audytowe (created_at, updated_at, created_by)
+   - SystemLog ma pole timestamp zamiast created_at, ponieważ jest to tabela logów
 
-2. **Strategia cache'owania danych**:
-   - Tabele DrugInteractions i TreatmentGuide służą jako pamięć podręczna dla odpowiedzi generowanych przez AI
-   - Redukuje to liczbę wywołań API do usług AI i poprawia wydajność
-   - Pola oceny pozwalają na ciągłe doskonalenie odpowiedzi AI
+2. **System ocen (Rating)**:
+   - Zastosowano generyczny system ocen oparty na ContentType Framework Django
+   - Pozwala to na ocenianie różnych typów treści (interakcji leków, przewodników leczenia) przy użyciu jednej tabeli
+   - Oceny są reprezentowane jako "up" lub "down" zamiast liczników w każdej tabeli
 
-3. **Długości pól tekstowych**:
-   - Długości pól są ograniczone zgodnie z wymaganiami
+3. **Struktura modeli leków**:
+   - Drug i CustomDrug dzielą wspólne pola dzięki bazie BaseDrugModel
+   - Obie tabele zawierają zarówno measurement_unit jak i per_weight_unit dla obsługi różnych jednostek miary
+
+4. **Długości pól tekstowych**:
+   - Długości pól są ograniczone zgodnie z wymaganiami Django i specyfikacjami aplikacji
    - VARCHAR(20) dla większości pól nazw
-   - VARCHAR(50) dla pól email i context
+   - VARCHAR(5) dla krótkich nazw jednostek
    - VARCHAR(100) dla dłuższych tekstów jak przeciwwskazania
-   - TEXT dla nieograniczonych pól tekstowych jak wyniki zapytań
+   - TEXT dla nieograniczonych pól tekstowych jak wyniki zapytań i opisy
 
-4. **Przechowywanie JSON**:
+5. **Przechowywanie JSON**:
    - TreatmentGuide.factors używa JSONB do przechowywania ustrukturyzowanych danych o czynnikach diagnostycznych
    - JSONB jest preferowany nad JSON dla lepszej wydajności zapytań z indeksami GIN
 
-5. **Historia wyszukiwania**:
+6. **Historia wyszukiwania**:
    - Tabela UserSearchHistory przechowuje historię wyszukiwania użytkownika we wszystkich modułach
-   - Wspiera to wymaganie US-016 dotyczące dostępu do poprzednich wyszukiwań
+   - Wspiera to dostęp do poprzednich wyszukiwań i analizy użytkownika
 
-6. **Względy bezpieczeństwa**:
-   - Bezpieczeństwo na poziomie wierszy (RLS) zapewnia izolację danych między użytkownikami
-   - Pole password powinno przechowywać tylko hasła hashowane (odpowiedzialność logiki aplikacji)
-   - Tabela SystemLogs umożliwia śledzenie zdarzeń związanych z bezpieczeństwem
+7. **System bezpieczeństwa**:
+   - Wykorzystanie mechanizmu ochrony na poziomie wierszy (RLS) PostgreSQL
+   - Model użytkownika oparty na AbstractUser Django z email zamiast username jako identyfikatora
+   - Bezpieczne przechowywanie haseł dzięki mechanizmom Django
