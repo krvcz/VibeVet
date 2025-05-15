@@ -48,6 +48,7 @@ jobs:
         DATABASE_HOST: localhost
         DATABASE_PORT: 5432
         DJANGO_SETTINGS_MODULE: config.settings
+        SECRET_KEY: test
       run: |
         cd backend
         pytest --cov=. --cov-report=xml
