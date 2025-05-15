@@ -42,7 +42,11 @@ jobs:
     
     - name: Run tests
       env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/github_actions
+        DATABASE_NAME: github_actions
+        DATABASE_USER: postgres
+        DATABASE_PASSWORD: postgres
+        DATABASE_HOST: localhost
+        DATABASE_PORT: 5432
         DJANGO_SETTINGS_MODULE: config.settings
       run: |
         cd backend
