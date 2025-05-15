@@ -1,8 +1,8 @@
 from decimal import Decimal, ROUND_HALF_UP
 from typing import Dict
 
-class UnitConversioError(Exception):
-    """Custom exception for dosage calculation errors."""
+class UnitConversionError(Exception):
+    """Custom exception for unit conversion errors."""
 
 class UnitConversionService:
     # Conversion factors relative to base units
@@ -36,7 +36,7 @@ class UnitConversionService:
             return cls.VOLUME_CONVERSIONS
         elif unit_type == 'concentration':
             return cls.CONCENTRATION_CONVERSIONS
-        raise UnitConversioError(f"Unknown unit type: {unit_type}")
+        raise UnitConversionError(f"Unknown unit type: {unit_type}")
 
     @classmethod
     def convert(cls, value: Decimal, from_unit: str, to_unit: str) -> Decimal:
@@ -52,14 +52,14 @@ class UnitConversionService:
             Decimal: The converted value
             
         Raises:
-            UnitConversioError: If units are incompatible or unknown
+            UnitConversionError: If units are incompatible or unknown
         """
         # First, determine the unit type
         unit_type = cls._determine_unit_type(from_unit, to_unit)
         conversion_map = cls.get_conversion_map(unit_type)
         
         if from_unit not in conversion_map or to_unit not in conversion_map:
-            raise UnitConversioError(f"Cannot convert from {from_unit} to {to_unit}")
+            raise UnitConversionError(f"Cannot convert from {from_unit} to {to_unit}")
         
         # Convert to base unit first, then to target unit
         base_value = value * conversion_map[from_unit]
@@ -78,7 +78,7 @@ class UnitConversionService:
                 return 'volume'
             elif unit in cls.CONCENTRATION_CONVERSIONS:
                 return 'concentration'
-        raise UnitConversioError(f"Cannot determine unit type for {unit1} and {unit2}")
+        raise UnitConversionError(f"Cannot determine unit type for {unit1} and {unit2}")
 
     @classmethod
     def is_compatible(cls, unit1: str, unit2: str) -> bool:
@@ -86,5 +86,5 @@ class UnitConversionService:
         try:
             cls._determine_unit_type(unit1, unit2)
             return True
-        except UnitConversioError:
+        except UnitConversionError:
             return False

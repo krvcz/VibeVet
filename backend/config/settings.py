@@ -15,6 +15,7 @@ import os
 from dotenv import load_dotenv
 import logging
 from rest_framework import status
+import sys
 
 # Load environment variables from .env file
 load_dotenv()

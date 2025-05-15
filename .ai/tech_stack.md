@@ -19,6 +19,18 @@ PostgreSQL: Zaawansowany system bazy danych relacyjnej z bogatymi możliwościam
 
 AI
 Openrouter.ai: Usługa pośrednicząca w komunikacji z różnymi modelami AI, umożliwiająca elastyczny wybór i zmianę dostawców AI. Zapewni niezawodną analizę ulotek leków PDF i ekstrakcję kluczowych informacji o dawkowaniu.
+
+Testowanie
+Django test runner: Wbudowane narzędzie testowe Django, które umożliwia sprawne przeprowadzanie testów jednostkowych i funkcjonalnych w środowisku frameworka.
+
+Unittest/Pytest: Frameworki testowe dla Pythona umożliwiające tworzenie i uruchamianie testów automatycznych. Pytest oferuje rozszerzone możliwości parametryzacji i raportowania.
+
+Coverage.py: Narzędzie do analizy pokrycia kodu testami, które pomaga zidentyfikować nietestowane części aplikacji i zwiększyć jakość testów.
+
+Postman/Insomnia: Narzędzia do testowania API, umożliwiające weryfikację poprawności działania endpointów REST API i odpowiedzi serwera.
+
+Factory Boy: Biblioteka do generowania danych testowych, która upraszcza tworzenie obiektów testowych i pomaga w utrzymaniu czystości środowiska testowego.
+
 CI/CD i Hosting
 Github Actions: Zautomatyzowane narzędzie CI/CD zintegrowane z GitHubem, umożliwiające automatyczne testowanie i wdrażanie aplikacji. Zapewni spójny proces rozwoju i wdrażania nowych funkcji.
 

@@ -45,6 +45,11 @@ The application aims to save time for veterinary practitioners and minimize medi
 ### Database
 - **PostgreSQL**: Advanced relational database system for storing complex medication data
 
+### Testing
+- **Unit Testing**: Django test runner, unittest, pytest, Coverage.py for code coverage analysis
+- **End-to-End Testing**: Postman/Insomnia for API testing, Factory Boy for test data management
+- **CI Testing**: Automated test execution through GitHub Actions
+
 ### AI Integration
 - **Openrouter.ai**: AI service for flexible model selection and provider switching
 

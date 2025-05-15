@@ -5,7 +5,7 @@ from django.db import transaction
 from ..models import Drug, Unit
 from common.models import Species
 from typing import Dict
-from common.services.unit_conversion_service import UnitConversionService
+from common.services.unit_conversion_service import UnitConversionService, UnitConversionError
 
 logger = logging.getLogger('drugs')
 
@@ -33,31 +33,50 @@ class DosageCalculatorService:
             
         Returns:
             Dict containing calculated dose and unit
+            
+        Raises:
+            DosageCalculationError: If calculation fails or units are incompatible
         """
-        # Calculate the weight factor (e.g., if drug is 100mg per 10kg and weight is 25kg, factor is 2.5)
-        weight_factor = weight / per_weight_value if per_weight_value else weight
-        
-        # Calculate the basic dosage
-        calculated_dose = drug_base_value * weight_factor
-        
-        # If target unit is different from source unit, convert it
-        if source_unit != target_unit:
-            calculated_dose = UnitConversionService.convert(
-                calculated_dose,
-                source_unit,
-                target_unit
-            )
-        else:
-            # Even if no conversion is needed, ensure consistent rounding
-            calculated_dose = calculated_dose.quantize(
-                Decimal('0.00001'),
-                rounding=ROUND_HALF_UP
-            )
+        try:
+            # Validate input values
+            if weight <= 0:
+                raise DosageCalculationError("Weight must be positive")
+            if drug_base_value <= 0:
+                raise DosageCalculationError("Drug base value must be positive")
+            if per_weight_value <= 0:
+                raise DosageCalculationError("Per weight value must be positive")
 
-        return {
-            'calculated_dose': calculated_dose,
-            'unit': target_unit
-        }
+            # Calculate the weight factor (e.g., if drug is 100mg per 10kg and weight is 25kg, factor is 2.5)
+            weight_factor = weight / per_weight_value if per_weight_value else weight
+            
+            # Calculate the basic dosage
+            calculated_dose = drug_base_value * weight_factor
+            
+            # If target unit is different from source unit, convert it
+            if source_unit != target_unit:
+                try:
+                    calculated_dose = UnitConversionService.convert(
+                        calculated_dose,
+                        source_unit,
+                        target_unit
+                    )
+                except UnitConversionError as e:
+                    raise DosageCalculationError(f"Unit conversion error: {str(e)}")
+            else:
+                # Even if no conversion is needed, ensure consistent rounding
+                calculated_dose = calculated_dose.quantize(
+                    Decimal('0.00001'),
+                    rounding=ROUND_HALF_UP
+                )
+
+            return {
+                'calculated_dose': calculated_dose,
+                'unit': target_unit
+            }
+        except DosageCalculationError:
+            raise
+        except Exception as e:
+            raise DosageCalculationError(f"Error calculating dosage: {str(e)}")
 
 @transaction.atomic
 def calculate_dosage(drug_id: int, weight: int, species: int, target_unit: int) -> dict:

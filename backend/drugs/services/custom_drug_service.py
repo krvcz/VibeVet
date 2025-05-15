@@ -49,7 +49,7 @@ def create_custom_drug(data: Dict[str, Any], user: 'AbstractUser') -> CustomDrug
     Raises:
         CustomDrugValidationError: If validation fails
         Species.DoesNotExist: If species_id is invalid
-        MeasurementUnit.DoesNotExist: If measurement_target_id is invalid
+        Unit.DoesNotExist: If measurement_unit_id is invalid
     """
     try:
         # Additional validation
@@ -57,7 +57,8 @@ def create_custom_drug(data: Dict[str, Any], user: 'AbstractUser') -> CustomDrug
         
         # Get related objects
         species: Species = Species.objects.get(id=data['species'])
-        measurement_unit: Unit = Unit.objects.get(id=data['measurement_target'])
+        measurement_unit: Unit = Unit.objects.get(id=data['measurement_unit'])
+        per_weight_unit: Unit = Unit.objects.get(id=data['per_weight_unit'])
         
         # Create custom drug in transaction
         with transaction.atomic():
@@ -67,7 +68,9 @@ def create_custom_drug(data: Dict[str, Any], user: 'AbstractUser') -> CustomDrug
                 species=species,
                 contraindications=data.get('contraindications'),
                 measurement_value=Decimal(str(data['measurement_value'])),
-                measurement_target=measurement_unit,
+                measurement_unit=measurement_unit,
+                per_weight_value=Decimal(str(data['per_weight_value'])),
+                per_weight_unit=per_weight_unit,
                 user=user,
                 created_by=user
             )
@@ -85,7 +88,7 @@ def create_custom_drug(data: Dict[str, Any], user: 'AbstractUser') -> CustomDrug
         raise CustomDrugValidationError('Invalid species selected') from exc
         
     except Unit.DoesNotExist as exc:
-        logger.error("Invalid measurement unit ID: %d", data['measurement_target'])
+        logger.error("Invalid measurement unit ID: %d", data.get('measurement_unit') or data.get('per_weight_unit'))
         raise CustomDrugValidationError('Invalid measurement unit selected') from exc
         
     except Exception as exc:
@@ -113,7 +116,7 @@ def update_custom_drug(
     Raises:
         CustomDrugValidationError: If validation fails
         Species.DoesNotExist: If species_id is invalid
-        MeasurementUnit.DoesNotExist: If measurement_target_id is invalid
+        Unit.DoesNotExist: If measurement_unit_id is invalid
     """
     if custom_drug.user != user:
         raise CustomDrugValidationError("You don't have permission to modify this custom drug")
@@ -129,9 +132,14 @@ def update_custom_drug(
                 custom_drug.species = species
                 
             # Update measurement unit if provided
-            if 'measurement_target' in data:
-                measurement_unit = MeasurementUnit.objects.get(id=data['measurement_target'])
-                custom_drug.measurement_target = measurement_unit
+            if 'measurement_unit' in data:
+                measurement_unit = Unit.objects.get(id=data['measurement_unit'])
+                custom_drug.measurement_unit = measurement_unit
+
+            # Update per weight unit if provided
+            if 'per_weight_unit' in data:
+                per_weight_unit = Unit.objects.get(id=data['per_weight_unit'])
+                custom_drug.per_weight_unit = per_weight_unit
             
             # Update scalar fields
             if 'name' in data:
@@ -142,6 +150,8 @@ def update_custom_drug(
                 custom_drug.contraindications = data['contraindications']
             if 'measurement_value' in data:
                 custom_drug.measurement_value = Decimal(str(data['measurement_value']))
+            if 'per_weight_value' in data:
+                custom_drug.per_weight_value = Decimal(str(data['per_weight_value']))
             
             custom_drug.save()
             
@@ -157,8 +167,8 @@ def update_custom_drug(
         logger.error("Invalid species ID: %d", data['species'])
         raise CustomDrugValidationError('Invalid species selected') from exc
         
-    except MeasurementUnit.DoesNotExist as exc:
-        logger.error("Invalid measurement unit ID: %d", data['measurement_target'])
+    except Unit.DoesNotExist as exc:
+        logger.error("Invalid measurement unit ID")
         raise CustomDrugValidationError('Invalid measurement unit selected') from exc
         
     except Exception as exc:
